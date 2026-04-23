@@ -1,0 +1,167 @@
+{
+  "nav": {
+    "logo": "IMPACT LEGENDS",
+    "links": [
+      { "label": "About",    "anchor": "about"    },
+      { "label": "Teams",    "anchor": "teams"    },
+      { "label": "Programs", "anchor": "programs" }
+    ],
+    "schedulesLabel": "Schedules",
+    "schedulesUrl": "https://www.advancedeventsystems.com",
+    "tryCta": "Register for Tryouts",
+    "themeLight": "Light Mode",
+    "themeDark": "Dark Mode"
+  },
+  "hero": {
+    "eyebrow": "Fort Wayne, IN · Est. 2022",
+    "titleLine1": "IMPACT",
+    "titleLine2": "LEGENDS",
+    "titleLine3": "VBC",
+    "subtitle": "Premier volleyball club developing elite athletes across northeast Indiana. Six age divisions. One relentless standard.",
+    "ctaPrimary": "Register for Tryouts →",
+    "ctaSecondary": "View Teams",
+    "scroll": "Scroll",
+    "stats": [
+      { "num": "6",    "lbl": "Club Teams"         },
+      { "num": "50+",  "lbl": "Players"             },
+      { "num": "2026", "lbl": "Season"              },
+      { "num": "FW",   "lbl": "Fort Wayne · Indiana" }
+    ]
+  },
+  "videoBanner": {
+    "eyebrow": "Impact Legends · In Action",
+    "titleLine1": "Where Champions",
+    "titleLine2": "Are Made",
+    "subtitle": "Six teams. Hundreds of hours on the court. One relentless pursuit of excellence."
+  },
+  "announcements": {
+    "eyebrow": "Club News",
+    "titlePlain": "Latest",
+    "titleHighlight": "Updates",
+    "subtitle": "News, achievements, and announcements from the club.",
+    "defaultLinkLabel": "Read more"
+  },
+  "teams": {
+    "eyebrow": "Club Teams",
+    "titlePlain": "Our",
+    "titleHighlight": "Teams",
+    "subtitle": "Six competitive divisions developing elite players from 12U through 18U across northeast Indiana."
+  },
+  "tryouts": {
+    "eyebrow": "Join the Club",
+    "titlePlain": "Tryouts",
+    "titleHighlight": "2026–27",
+    "description": "Open to players 12–18. Register online before arriving. Spots are limited — don't miss your chance to wear the jersey.",
+    "feeAmount": "$40",
+    "feeLabel": "tryout fee · payable at event or via Venmo/PayPal",
+    "cta": "Register Now →",
+    "locationsHeading": "Locations",
+    "locationsNote": "If smaller group, tryout times may be shorter.",
+    "locations": [
+      { "name": "Saint Aloysius School", "address": "14623 Bluffton Road, Yoder, IN 46798" }
+    ]
+  },
+  "programs": {
+    "eyebrow": "What We Offer",
+    "title": "Programs",
+    "subtitle": "From first-time club players to college-bound athletes — we have a program for every level.",
+    "items": [
+      {
+        "icon": "🏐",
+        "title": "Club Volleyball",
+        "description": "Competitive club teams for players ages 12–18. Six divisions spanning Blue and Pink brackets, competing in regional and national tournaments across the Midwest.",
+        "featured": true
+      },
+      {
+        "icon": "🎓",
+        "title": "Recruiting",
+        "description": "We actively support college-bound athletes with recruiting resources, film, and coach connections.",
+        "featured": false
+      },
+      {
+        "icon": "⛺",
+        "title": "Camps & Clinics",
+        "description": "Youth development camps and position-specific clinics open to all skill levels throughout the year.",
+        "featured": false
+      }
+    ]
+  },
+  "fees": {
+    "eyebrow": "Club Fees",
+    "titleLine1": "Payment",
+    "titleLine2": "Info",
+    "subtitle": "Multiple payment options available. Always include your player name and team in the note.",
+    "waysToPayTitle": "Ways to Pay",
+    "methods": [
+      { "label": "Venmo",          "cls": "free" },
+      { "label": "PayPal Personal","cls": "free" },
+      { "label": "CashApp",        "cls": "free" },
+      { "label": "PayPal Business","cls": "fee"  },
+      { "label": "Check",          "cls": ""     },
+      { "label": "Cash",           "cls": ""     }
+    ],
+    "rules": [
+      { "icon": "📅", "cls": "rule-due",   "text": "Fees are due by the first practice of each month." },
+      { "icon": "⚠",  "cls": "rule-late",  "text": "A $25 late fee applies after 5 days past the due date." },
+      { "icon": "✉",  "cls": "rule-check", "text": "Checks payable to Legends Sports Academy" }
+    ],
+    "mailTitle": "Mail / Drop-off Address",
+    "mailAddress": "2525 Florida Drive, Fort Wayne, IN 46805",
+    "qrTitle": "Scan to Pay",
+    "qrInstruction": "Scan with your phone camera or app. Always include your player name in the payment note."
+  },
+  "sponsors": {
+    "eyebrow": "2026 Partners",
+    "titlePlain": "Our",
+    "titleHighlight": "Sponsors",
+    "subtitle": "These businesses make our club possible. Please support them.",
+    "becomeTitle": "Become a Sponsor",
+    "becomeDescription": "Support youth athletics in Fort Wayne and get your brand in front of our community.",
+    "becomeCta": "Contact Us",
+    "contactEmail": "info@impactvbcfw.com"
+  },
+  "community": {
+    "eyebrow": "Community",
+    "defaultLinkLabel": "Learn More"
+  },
+  "footer": {
+    "logo": "IMPACT LEGENDS",
+    "tagline": "Premier youth volleyball club in Fort Wayne, Indiana. Developing elite athletes and legendary character.",
+    "address": "2525 Florida Drive, Fort Wayne, IN 46805",
+    "facebookUrl": "https://www.facebook.com/impactvolleyballclubfw/",
+    "instagramUrl": "https://www.instagram.com/impactlegendsvbc?igsh=YWhuNGozaGt0cm5m&utm_source=qr",
+    "columns": [
+      {
+        "title": "Teams",
+        "links": [
+          { "label": "12 Blue", "id": "teams" },
+          { "label": "14 Blue", "id": "teams" },
+          { "label": "16 Blue", "id": "teams" },
+          { "label": "16 Pink", "id": "teams" },
+          { "label": "17 Blue", "id": "teams" },
+          { "label": "18 Blue", "id": "teams" }
+        ]
+      },
+      {
+        "title": "Club",
+        "links": [
+          { "label": "About",     "id": "about"    },
+          { "label": "Programs",  "id": "programs" },
+          { "label": "Tryouts",   "id": "tryouts"  },
+          { "label": "Sponsors",  "id": "sponsors" },
+          { "label": "Club Fees", "id": "fees"     }
+        ]
+      },
+      {
+        "title": "External",
+        "links": [
+          { "label": "Schedules & Results", "href": "https://www.advancedeventsystems.com" },
+          { "label": "Register (Tryouts)",  "href": "https://forms.gle/zmnEhvmebK5z3JJw9" },
+          { "label": "Facebook",            "href": "https://www.facebook.com/impactvolleyballclubfw/" },
+          { "label": "Instagram",           "href": "https://www.instagram.com/impactlegendsvbc?igsh=YWhuNGozaGt0cm5m&utm_source=qr" }
+        ]
+      }
+    ],
+    "copyright": "Impact Legends Volleyball Club · Fort Wayne, IN 46805"
+  }
+}

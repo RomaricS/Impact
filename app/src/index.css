@@ -450,7 +450,7 @@ h1 .grad {
   letter-spacing: 0.02em;
   margin-bottom: 1.25rem;
 }
-.sec-sub { color: var(--muted); font-size: 0.98rem; max-width: 480px; line-height: 1.75; }
+.sec-sub { color: var(--muted); font-size: 0.98rem; max-width: 480px; line-height: 1.75; margin-bottom: 1rem; }
 
 /* REVEAL */
 .rv { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
