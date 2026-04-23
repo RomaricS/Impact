@@ -9,12 +9,20 @@ export function useSettings() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'settings', 'main'), snap => {
-      if (snap.exists() && snap.data().registrationLink) {
-        setSettings({ registrationLink: snap.data().registrationLink });
+    const unsub = onSnapshot(
+      doc(db, 'settings', 'main'),
+      snap => {
+        const data = snap.data();
+        if (snap.exists() && data.registrationLink) {
+          setSettings({ registrationLink: data.registrationLink });
+        }
+        setLoading(false);
+      },
+      err => {
+        console.error('Firestore settings error:', err);
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    );
     return unsub;
   }, []);
 
