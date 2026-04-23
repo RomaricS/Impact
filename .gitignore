@@ -1,0 +1,21 @@
+# Static site / root-level files (not the React app)
+index.html
+/assets/
+impact-teams-updated.json
+site-content.json
+team-data.js
+
+# Video files (too large for git)
+**/*.mov
+**/*.mp4
+
+# Large local photo folders — these live in Firebase Storage
+app/public/assets/Players/
+app/public/assets/Coaches/
+
+# OS
+.DS_Store
+
+# Claude Code memory / session logs
+.remember/
+.claude/
