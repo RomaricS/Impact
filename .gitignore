@@ -6,8 +6,6 @@ site-content.json
 team-data.js
 
 # Video files (too large for git)
-**/*.mov
-**/*.mp4
 
 # Large local photo folders — these live in Firebase Storage
 app/public/assets/Players/
