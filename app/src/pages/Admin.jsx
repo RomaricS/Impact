@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useTeams } from '../hooks/useTeams';
 import { usePayments } from '../hooks/usePayments';
+import { useSettings } from '../hooks/useSettings';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, storage } from '../lib/firebase';
 import ImageUpload from '../admin/ImageUpload';
 
 const TEAM_ORDER = ['12-blue', '14-blue', '16-blue', '16-pink', '17-blue', '18-blue'];
@@ -425,6 +426,22 @@ function SettingsPage({ teams, toast }) {
   const { qrs } = usePayments();
   const [qrDraft, setQrDraft] = useState(null);
   const [savingQr, setSavingQr] = useState(false);
+  const { settings } = useSettings();
+  const [regLink, setRegLink] = useState('');
+  const [savingReg, setSavingReg] = useState(false);
+  useEffect(() => { setRegLink(settings.registrationLink); }, [settings.registrationLink]);
+
+  async function saveRegLink() {
+    setSavingReg(true);
+    try {
+      await setDoc(doc(db, 'settings', 'main'), { registrationLink: regLink }, { merge: true });
+      toast('Registration link saved ✓');
+    } catch {
+      toast('Save failed', 'error');
+    } finally {
+      setSavingReg(false);
+    }
+  }
 
   // Initialize draft from live data when first opened
   function openQrEditor() {
@@ -491,6 +508,26 @@ function SettingsPage({ teams, toast }) {
     <div>
       <div className="admin-page-title">Settings</div>
       <div className="admin-page-sub">Site configuration and data management.</div>
+
+      <div className="admin-card">
+        <div className="admin-card-title">Tryout Registration Link</div>
+        <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '1.25rem', lineHeight: 1.7 }}>
+          The URL the "Register Now" button in the Tryouts section points to.
+        </p>
+        <div className="admin-form">
+          <div className="form-group">
+            <label className="form-label">Registration URL</label>
+            <input className="form-input" value={regLink}
+                   onChange={e => setRegLink(e.target.value)}
+                   placeholder="https://forms.gle/…" />
+          </div>
+          <div className="admin-actions">
+            <button className="admin-btn admin-btn-primary" onClick={saveRegLink} disabled={savingReg}>
+              {savingReg ? 'Saving…' : 'Save Link'}
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* ── QR Code Editor ── */}
       <div className="admin-card">
