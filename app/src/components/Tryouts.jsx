@@ -30,8 +30,7 @@ export default function Tryouts() {
             </p>
             <div className="loc-list">
               {[
-                { name: 'Canterbury High School', addr: '3210 Smith Road, Fort Wayne, IN 46804' },
-                { name: 'Saint Aloysius School',  addr: '14623 Bluffton Road, Yoder, IN 46798' },
+                { name: 'Saint Aloysius School', addr: '14623 Bluffton Road, Yoder, IN 46798' },
               ].map(l => (
                 <div key={l.name} className="loc-card">
                   <div className="loc-name">{l.name}</div>

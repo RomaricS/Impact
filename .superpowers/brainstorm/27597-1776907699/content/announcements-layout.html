@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Announcements Layout Options</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0f1e; color: #e8eaf0; font-family: 'Inter', sans-serif; padding: 2rem 1.5rem 5rem; }
+  :root { --pink: #ff1f6d; --border: rgba(255,255,255,0.08); --card: #111827; --muted: rgba(232,234,240,0.5); }
+
+  .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.2em; color: var(--pink); text-align: center; margin-bottom: 0.4rem; }
+  .page-sub { text-align: center; color: var(--muted); font-size: 0.82rem; margin-bottom: 2.5rem; }
+
+  .option-block { border: 2px solid transparent; border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: rgba(255,255,255,0.02); }
+  .option-block:hover { border-color: rgba(255,31,109,0.4); background: rgba(255,31,109,0.04); }
+  .option-block.selected { border-color: var(--pink); background: rgba(255,31,109,0.07); }
+
+  .option-label { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--pink); margin-bottom: 1rem; }
+  .option-label .letter { width: 22px; height: 22px; border-radius: 50%; background: var(--pink); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; }
+
+  .sec-eye { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--pink); margin-bottom: 0.5rem; }
+  .sec-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; line-height: 1; letter-spacing: 0.04em; margin-bottom: 0.6rem; }
+  .sec-sub { color: var(--muted); font-size: 0.88rem; line-height: 1.7; margin-bottom: 1.25rem; }
+  .pink { color: var(--pink); }
+  .news-date { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pink); margin-bottom: 0.35rem; }
+
+  /* OPTION A — Scrollable cards */
+  .scroll-row { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 0.5rem; }
+  .scroll-row::-webkit-scrollbar { height: 4px; }
+  .scroll-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .news-card-h { flex: 0 0 255px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .news-card-h-img { width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; }
+  .bg1 { background: linear-gradient(135deg, #1a2240 0%, #0d1630 100%); }
+  .bg2 { background: linear-gradient(135deg, #1a1a30 0%, #0d1630 100%); }
+  .bg3 { background: linear-gradient(135deg, #1a2010 0%, #0d1830 100%); }
+  .bg4 { background: linear-gradient(135deg, #201a10 0%, #1a0d20 100%); }
+  .news-card-h-body { padding: 0.9rem; }
+  .news-card-h-body h4 { font-size: 0.85rem; font-weight: 700; line-height: 1.35; margin-bottom: 0.35rem; }
+  .news-card-h-body p { font-size: 0.74rem; color: var(--muted); line-height: 1.6; }
+
+  /* OPTION B — Magazine grid */
+  .mag-grid { display: grid; grid-template-columns: 1.6fr 1fr; grid-template-rows: auto auto; gap: 1rem; }
+  .mag-featured { grid-row: 1 / 3; background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .mag-img { width: 100%; height: 190px; display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative; background: linear-gradient(135deg, #1e1030 0%, #0d1630 100%); }
+  .featured-pill { position: absolute; top: 10px; left: 10px; background: var(--pink); color: #fff; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em; padding: 0.2rem 0.6rem; border-radius: 100px; }
+  .mag-body { padding: 1.1rem; }
+  .mag-body h3 { font-size: 1rem; font-weight: 700; line-height: 1.3; margin-bottom: 0.45rem; }
+  .mag-body p { font-size: 0.78rem; color: var(--muted); line-height: 1.65; }
+  .mag-link { display: inline-block; font-size: 0.74rem; font-weight: 600; color: var(--pink); margin-top: 0.65rem; text-decoration: none; }
+  .mag-small { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem; }
+  .mag-small h4 { font-size: 0.82rem; font-weight: 700; line-height: 1.35; margin-bottom: 0.25rem; }
+  .mag-small p { font-size: 0.72rem; color: var(--muted); line-height: 1.55; }
+
+  /* OPTION C — Timeline feed */
+  .feed { display: flex; flex-direction: column; gap: 0; position: relative; }
+  .feed::before { content: ''; position: absolute; left: 11px; top: 8px; bottom: 8px; width: 1px; background: var(--border); }
+  .feed-item { display: grid; grid-template-columns: 24px 1fr; gap: 1rem; align-items: start; padding: 0 0 1.25rem 0; }
+  .feed-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--card); border: 2px solid var(--pink); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; flex-shrink: 0; margin-top: 2px; position: relative; z-index: 1; }
+  .feed-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .feed-img { width: 100%; height: 105px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+  .feed-body { padding: 0.9rem; }
+  .feed-body h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .feed-body p { font-size: 0.76rem; color: var(--muted); line-height: 1.6; }
+  .feed-meta { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.55rem; }
+  .feed-tag { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,31,109,0.12); color: var(--pink); padding: 0.15rem 0.5rem; border-radius: 100px; }
+
+  /* selection bar */
+  #sel-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; border-top: 1px solid rgba(255,31,109,0.25); padding: 0.75rem 1.5rem; font-size: 0.8rem; color: var(--muted); }
+  #sel-bar strong { color: var(--pink); }
+</style>
+</head>
+<body>
+
+<div class="page-title">ANNOUNCEMENTS SECTION</div>
+<div class="page-sub">How should news appear on the public site? Click an option to select.</div>
+
+<!-- OPTION A -->
+<div class="option-block" onclick="pick('A',this)">
+  <div class="option-label"><div class="letter">A</div> Scrollable Card Row</div>
+  <div class="sec-eye">Club News</div>
+  <div class="sec-title">Latest <span class="pink">Updates</span></div>
+  <div class="sec-sub">News, achievements, and announcements from the club.</div>
+  <div class="scroll-row">
+    <div class="news-card-h">
+      <div class="news-card-h-img bg1">🏐</div>
+      <div class="news-card-h-body">
+        <div class="news-date">Apr 18 · 2026</div>
+        <h4>Emma Johnson Signs with Purdue University</h4>
+        <p>Incredibly proud of Emma and her commitment to compete at the Big Ten level.</p>
+      </div>
+    </div>
+    <div class="news-card-h">
+      <div class="news-card-h-img bg2">🏆</div>
+      <div class="news-card-h-body">
+        <div class="news-date">Apr 12 · 2026</div>
+        <h4>16U Wins Gold at Hoosier Crossroads</h4>
+        <p>Undefeated across 8 matches to take the championship title.</p>
+      </div>
+    </div>
+    <div class="news-card-h">
+      <div class="news-card-h-img bg3">📋</div>
+      <div class="news-card-h-body">
+        <div class="news-date">Apr 5 · 2026</div>
+        <h4>Tryout Registration Now Open</h4>
+        <p>Spots for 2026–27 are limited. Register early to secure your place.</p>
+      </div>
+    </div>
+    <div class="news-card-h">
+      <div class="news-card-h-img bg4">🎓</div>
+      <div class="news-card-h-body">
+        <div class="news-date">Mar 28 · 2026</div>
+        <h4>Mia Torres Commits to Indiana State</h4>
+        <p>A three-year Impact veteran earns her Division I scholarship.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION B -->
+<div class="option-block" onclick="pick('B',this)">
+  <div class="option-label"><div class="letter">B</div> Magazine Grid</div>
+  <div class="sec-eye">Club News</div>
+  <div class="sec-title">Latest <span class="pink">Updates</span></div>
+  <div class="sec-sub">News, achievements, and announcements from the club.</div>
+  <div class="mag-grid">
+    <div class="mag-featured">
+      <div class="mag-img">🏐<span class="featured-pill">FEATURED</span></div>
+      <div class="mag-body">
+        <div class="news-date" style="margin-bottom:0.4rem">Apr 18 · 2026</div>
+        <h3>Emma Johnson Signs with Purdue University</h3>
+        <p>We are incredibly proud of Emma and her four years of dedication. She commits to compete at the Big Ten level starting Fall 2026.</p>
+        <a class="mag-link" href="#">Read more →</a>
+      </div>
+    </div>
+    <div class="mag-small">
+      <div class="news-date">Apr 12 · 2026</div>
+      <h4>16U Wins Gold at Hoosier Crossroads</h4>
+      <p>Undefeated across 8 matches to take the title.</p>
+    </div>
+    <div class="mag-small">
+      <div class="news-date">Apr 5 · 2026</div>
+      <h4>Tryout Registration Now Open</h4>
+      <p>Spots for 2026–27 are limited. Register early.</p>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION C -->
+<div class="option-block" onclick="pick('C',this)">
+  <div class="option-label"><div class="letter">C</div> Timeline Feed</div>
+  <div class="sec-eye">Club News</div>
+  <div class="sec-title">Latest <span class="pink">Updates</span></div>
+  <div class="sec-sub">News, achievements, and announcements from the club.</div>
+  <div class="feed">
+    <div class="feed-item">
+      <div class="feed-dot">🏐</div>
+      <div class="feed-card">
+        <div class="feed-img bg1">🏐</div>
+        <div class="feed-body">
+          <h4>Emma Johnson Signs with Purdue University</h4>
+          <p>We are incredibly proud of Emma and her commitment to compete at the Big Ten level.</p>
+          <div class="feed-meta"><span class="news-date" style="margin:0">Apr 18, 2026</span><span class="feed-tag">Signing</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="feed-item">
+      <div class="feed-dot">🏆</div>
+      <div class="feed-card">
+        <div class="feed-body">
+          <h4>16U Wins Gold at Hoosier Crossroads</h4>
+          <p>Our 16 Elite team went undefeated across 8 matches to take the championship title.</p>
+          <div class="feed-meta"><span class="news-date" style="margin:0">Apr 12, 2026</span><span class="feed-tag">Tournament</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="feed-item">
+      <div class="feed-dot">📋</div>
+      <div class="feed-card">
+        <div class="feed-body">
+          <h4>Tryout Registration Now Open</h4>
+          <p>Spots for the 2026–27 season are limited. Register early to secure your place.</p>
+          <div class="feed-meta"><span class="news-date" style="margin:0">Apr 5, 2026</span><span class="feed-tag">Announcement</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="sel-bar">Click an option above to select it</div>
+
+<script>
+  function pick(letter, el) {
+    document.querySelectorAll('.option-block').forEach(function(b){ b.classList.remove('selected'); });
+    el.classList.add('selected');
+    var bar = document.getElementById('sel-bar');
+    var strong = document.createElement('strong');
+    strong.textContent = 'Option ' + letter;
+    bar.textContent = 'Selected: ';
+    bar.appendChild(strong);
+    var rest = document.createTextNode(' — let me know in the terminal if this works or if you want tweaks.');
+    bar.appendChild(rest);
+  }
+</script>
+</body>
+</html>
