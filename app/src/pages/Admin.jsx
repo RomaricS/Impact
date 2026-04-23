@@ -24,12 +24,14 @@ function EmptyItem({ label, onCreate }) {
 }
 
 /* ─── Player editor ─── */
+const POSITIONS = ['OPP', 'S', 'MB', 'DS', 'L', 'OH'];
+
 function RosterEditor({ team, onSave }) {
   const [roster, setRoster] = useState(team.roster || []);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name: '', num: '', pos: '', photo: '' });
 
-  function openAdd() { setForm({ name: '', num: '', pos: '', photo: '', gradYear: '', school: '' }); setEditing('new'); }
+  function openAdd() { setForm({ name: '', num: '', pos: '', pos2: '', photo: '', gradYear: '', school: '' }); setEditing('new'); }
   function openEdit(i) { setForm({ ...roster[i] }); setEditing(i); }
 
   function save() {
@@ -69,18 +71,28 @@ function RosterEditor({ team, onSave }) {
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Position</label>
-                <input className="form-input" value={form.pos} placeholder="e.g. Outside Hitter" onChange={e => setForm(f => ({ ...f, pos: e.target.value }))} />
+                <label className="form-label">Position 1</label>
+                <select className="form-select" value={form.pos} onChange={e => setForm(f => ({ ...f, pos: e.target.value }))}>
+                  <option value="">Select position…</option>
+                  {POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Player Photo</label>
-                <ImageUpload
-                  value={form.photo}
-                  onChange={url => setForm(f => ({ ...f, photo: url }))}
-                  path={`players/${form.name.replace(/\s+/g,'-').toLowerCase() || 'player'}`}
-                  portrait
-                />
+                <label className="form-label">Position 2 (optional)</label>
+                <select className="form-select" value={form.pos2 || ''} onChange={e => setForm(f => ({ ...f, pos2: e.target.value }))}>
+                  <option value="">None</option>
+                  {POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
               </div>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Player Photo</label>
+              <ImageUpload
+                value={form.photo}
+                onChange={url => setForm(f => ({ ...f, photo: url }))}
+                path={`players/${form.name.replace(/\s+/g,'-').toLowerCase() || 'player'}`}
+                portrait
+              />
             </div>
             <div className="form-row">
               <div className="form-group">

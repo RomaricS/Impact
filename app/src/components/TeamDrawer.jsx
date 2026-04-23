@@ -3,6 +3,7 @@ import { logEvent } from '../lib/firebase';
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const POSITIONS = ['OPP', 'S', 'MB', 'DS', 'L', 'OH'];
 
 function dateToNum(str) {
   if (!str) return 0;
@@ -175,8 +176,8 @@ export default function TeamDrawer({ team, onClose }) {
   }, []);
 
   const roster = team.roster || [];
-  const positions = ['All', ...new Set(roster.map(p => p.pos).filter(Boolean))];
-  const filtered = posFilter === 'All' ? roster : roster.filter(p => p.pos === posFilter);
+  const positions = ['All', ...POSITIONS];
+  const filtered = posFilter === 'All' ? roster : roster.filter(p => p.pos === posFilter || p.pos2 === posFilter);
 
   const tabs = [
     { id: 'schedule', label: 'Schedule' },
@@ -239,7 +240,10 @@ export default function TeamDrawer({ team, onClose }) {
                     </div>
                     {p.num > 0 && <div className="player-num">#{p.num}</div>}
                     <div className="player-name">{p.name}</div>
-                    {p.pos && <div className="player-pos-badge">{p.pos}</div>}
+                    <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                      {p.pos && <div className="player-pos-badge">{p.pos}</div>}
+                      {p.pos2 && <div className="player-pos-badge">{p.pos2}</div>}
+                    </div>
                     {(p.gradYear || p.school) && (
                       <div style={{ fontSize: '0.62rem', color: 'var(--muted)', marginTop: '0.3rem', lineHeight: 1.4 }}>
                         {p.school && <span>{p.school}</span>}
