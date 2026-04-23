@@ -66,7 +66,7 @@ export default function Fees() {
             </div>
             <div style={{ fontSize: '.78rem', color: 'var(--muted)', lineHeight: 1.6, paddingTop: '.75rem', borderTop: '1px solid var(--border)' }}>
               Scan with your phone camera or app. Always include your{' '}
-              <strong style={{ color: 'var(--fg)' }}>player name & team</strong> in the payment note.
+              <strong style={{ color: 'var(--fg)' }}>player name</strong> in the payment note.
             </div>
           </div>
         </div>
