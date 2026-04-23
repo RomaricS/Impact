@@ -17,7 +17,7 @@ export default function Tryouts() {
               <span className="price-num">$40</span>
               <span className="price-lbl">tryout fee · payable at event or via Venmo/PayPal</span>
             </div>
-            <a href="https://forms.gle/bZdUaRmFzXLsSxpy7" target="_blank" rel="noreferrer"
+            <a href="https://forms.gle/zmnEhvmebK5z3JJw9" target="_blank" rel="noreferrer"
                className="btn btn-p" style={{ marginTop: '2rem', display: 'inline-flex' }}
                onClick={() => logEvent('tryout_register_click')}>
               Register Now →

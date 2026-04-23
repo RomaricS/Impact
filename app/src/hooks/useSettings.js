@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
-const DEFAULT_LINK = 'https://forms.gle/bZdUaRmFzXLsSxpy7';
+const DEFAULT_LINK = 'https://forms.gle/zmnEhvmebK5z3JJw9';
 
 export function useSettings() {
   const [settings, setSettings] = useState({ registrationLink: DEFAULT_LINK });

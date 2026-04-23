@@ -26,7 +26,7 @@ export default function Footer() {
       title: 'External',
       links: [
         { label: 'Schedules & Results', href: 'https://www.advancedeventsystems.com' },
-        { label: 'Register (Tryouts)', href: 'https://forms.gle/bZdUaRmFzXLsSxpy7' },
+        { label: 'Register (Tryouts)', href: 'https://forms.gle/zmnEhvmebK5z3JJw9' },
         { label: 'Facebook', href: 'https://www.facebook.com/impactvolleyballclubfw/' },
         { label: 'Instagram', href: 'https://www.instagram.com/impactlegendsvbc?igsh=YWhuNGozaGt0cm5m&utm_source=qr' },
       ],
