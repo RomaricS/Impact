@@ -1,29 +1,12 @@
 import { useReveal } from '../hooks/useReveal';
+import { useSponsors } from '../hooks/useSponsors';
 
-const TIERS = [
-  {
-    cls: 't-kill', label: 'Kill Level', amount: '$1,000+',
-    sponsors: [
-      { logo: 'https://static.wixstatic.com/media/bece4b_c80545f3bd9a49c9ae23d08054cd55d0~mv2.png', addr: '5825 Covington Rd, Fort Wayne, IN 46804' },
-      { logo: 'https://static.wixstatic.com/media/bece4b_fef4f5367f6645f589c4b529e66591ae~mv2.png', addr: '243 Airport North Office Park, Fort Wayne, IN 46825' },
-    ],
-  },
-  {
-    cls: 't-ace', label: 'Ace Level', amount: '$500–$999',
-    sponsors: [
-      { logo: 'https://static.wixstatic.com/media/bece4b_c95f00c14b8b4d22875727781ff15a26~mv2.jpeg', addr: '6906 Ardmore Ave, Fort Wayne, IN 46809' },
-    ],
-  },
-  {
-    cls: 't-block', label: 'Block Level', amount: '$250–$499',
-    sponsors: [
-      { logo: 'https://static.wixstatic.com/media/bece4b_5527b50f43fb4558b1b1da737dfe75c0~mv2.png', addr: '7908 Carnegie Blvd, Fort Wayne, IN 46804' },
-    ],
-  },
-];
+const TIER_CLASSES = ['t-kill', 't-ace', 't-block'];
 
 export default function Sponsors() {
   const ref = useReveal();
+  const { tiers } = useSponsors();
+
   return (
     <section className="sec sponsors-sec" id="sponsors" ref={ref}>
       <div className="container">
@@ -34,16 +17,16 @@ export default function Sponsors() {
         </div>
 
         <div className="tier-row">
-          {TIERS.map(tier => (
-            <div key={tier.label} className="rv">
+          {tiers.map((tier, i) => (
+            <div key={tier.tierLabel} className="rv">
               <div className="tier-hdr">
-                <span className={`tier-pill ${tier.cls}`}>{tier.label}</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{tier.amount}</span>
+                <span className={`tier-pill ${TIER_CLASSES[i] || 't-block'}`}>{tier.tierLabel}</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{tier.tierAmount}</span>
                 <div className="tier-line" />
               </div>
               <div className="logo-row">
-                {tier.sponsors.map((s, i) => (
-                  <div key={i} className="logo-card">
+                {tier.sponsors.map(s => (
+                  <div key={s.id} className="logo-card">
                     <img src={s.logo} alt="Sponsor logo" />
                   </div>
                 ))}
