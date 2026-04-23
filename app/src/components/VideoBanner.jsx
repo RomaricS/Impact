@@ -3,7 +3,7 @@ import content from '../content.json';
 export default function VideoBanner() {
   return (
     <div className="video-banner">
-      <video autoPlay muted loop playsInline preload="none" src="/assets/vid.mov" />
+      <video autoPlay muted loop playsInline preload="none" src="/assets/vid.mp4" />
       <div className="video-overlay" />
       <div className="video-content">
         <div className="eyebrow">{content.videoBanner.eyebrow}</div>
