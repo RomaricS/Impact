@@ -1,8 +1,10 @@
 import { useReveal } from '../hooks/useReveal';
+import { useSettings } from '../hooks/useSettings';
 import { logEvent } from '../lib/firebase';
 
 export default function Tryouts() {
   const ref = useReveal();
+  const { settings } = useSettings();
   return (
     <section className="tryouts-sec sec" id="tryouts" ref={ref}>
       <div className="container">
@@ -17,7 +19,7 @@ export default function Tryouts() {
               <span className="price-num">$40</span>
               <span className="price-lbl">tryout fee · payable at event or via Venmo/PayPal</span>
             </div>
-            <a href="https://forms.gle/zmnEhvmebK5z3JJw9" target="_blank" rel="noreferrer"
+            <a href={settings.registrationLink} target="_blank" rel="noreferrer"
                className="btn btn-p" style={{ marginTop: '2rem', display: 'inline-flex' }}
                onClick={() => logEvent('tryout_register_click')}>
               Register Now →
