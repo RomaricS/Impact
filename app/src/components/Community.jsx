@@ -3,8 +3,8 @@ import { useReveal } from '../hooks/useReveal';
 import { useCommunity } from '../hooks/useCommunity';
 
 export default function Community() {
-  const ref = useReveal();
   const { campaigns, loading } = useCommunity();
+  const ref = useReveal([loading]);
   const [activeIdx, setActiveIdx] = useState(0);
 
   if (!loading && campaigns.length === 0) return null;
