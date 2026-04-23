@@ -5,7 +5,7 @@ import { useSponsors } from '../hooks/useSponsors';
 import ImageUpload from './ImageUpload';
 
 const TIER_CLASSES = ['t-kill', 't-ace', 't-block'];
-const EMPTY_FORM = { logo: '', addr: '', tierLabel: '', tierAmount: '', tierOrder: 0, order: 0 };
+const EMPTY_FORM = { logo: '', name: '', addr: '', tierLabel: '', tierAmount: '', tierOrder: 0, order: 0 };
 
 export default function SponsorsPanel({ toast }) {
   const { tiers, sponsors } = useSponsors();
@@ -20,7 +20,7 @@ export default function SponsorsPanel({ toast }) {
     const maxOrder = sponsors
       .filter(s => s.tierLabel === tier.tierLabel)
       .reduce((m, s) => Math.max(m, s.order ?? 0), -1);
-    setForm({ logo: '', addr: '', tierLabel: tier.tierLabel, tierAmount: tier.tierAmount, tierOrder: tier.tierOrder, order: maxOrder + 1 });
+    setForm({ logo: '', name: '', addr: '', tierLabel: tier.tierLabel, tierAmount: tier.tierAmount, tierOrder: tier.tierOrder, order: maxOrder + 1 });
     setUseNewTier(false);
     setTierForm({ label: '', amount: '', tierOrder: tiers.length });
     setEditingId(null);
@@ -131,6 +131,12 @@ export default function SponsorsPanel({ toast }) {
             <div className="form-group">
               <label className="form-label">Logo</label>
               <ImageUpload value={form.logo} onChange={url => setForm(f => ({ ...f, logo: url }))} path="sponsors/logo" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Name (optional)</label>
+              <input className="form-input" value={form.name}
+                     onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                     placeholder="Acme Corporation" />
             </div>
             <div className="form-group">
               <label className="form-label">Address</label>

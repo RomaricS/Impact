@@ -1328,6 +1328,9 @@ footer {
 .toast.error { border-color: rgba(255,31,109,0.3); }
 .toast.error::before { content: '✕'; color: var(--pink); font-weight: 700; }
 
+/* SPONSORS */
+.sponsor-name { font-size: 0.68rem; font-weight: 600; color: var(--muted); text-align: center; margin-top: 0.4rem; letter-spacing: 0.04em; }
+
 /* ANNOUNCEMENTS */
 .ann-feed { display: flex; flex-direction: column; position: relative; max-width: 680px; }
 .ann-feed::before { content: ''; position: absolute; left: 15px; top: 8px; bottom: 8px; width: 1px; background: var(--border); }

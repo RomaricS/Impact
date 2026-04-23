@@ -27,7 +27,8 @@ export default function Sponsors() {
               <div className="logo-row">
                 {tier.sponsors.map(s => (
                   <div key={s.id} className="logo-card">
-                    <img src={s.logo} alt="Sponsor logo" />
+                    <img src={s.logo} alt={s.name || 'Sponsor logo'} />
+                    {s.name && <div className="sponsor-name">{s.name}</div>}
                   </div>
                 ))}
               </div>
