@@ -55,16 +55,19 @@ export default function Community() {
         {multi && (
           <div className="comm-controls">
             <button className="comm-arrow"
+                    onMouseDown={e => e.preventDefault()}
                     onClick={() => setActiveIdx(i => Math.max(0, i - 1))}
                     disabled={activeIdx === 0}>‹</button>
             <div className="comm-dots">
               {campaigns.map((_, i) => (
                 <button key={i}
                         className={`comm-dot ${i === idx ? 'on' : ''}`}
+                        onMouseDown={e => e.preventDefault()}
                         onClick={() => setActiveIdx(i)} />
               ))}
             </div>
             <button className="comm-arrow"
+                    onMouseDown={e => e.preventDefault()}
                     onClick={() => setActiveIdx(i => Math.min(campaigns.length - 1, i + 1))}
                     disabled={activeIdx === campaigns.length - 1}>›</button>
           </div>
