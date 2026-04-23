@@ -47,7 +47,7 @@ export default function Fees() {
 
             <div className="check-box">
               <strong>Mail / Drop-off Address</strong>
-              2525 Florida Drive, Fort Wayne, IN 46802
+              2525 Florida Drive, Fort Wayne, IN 46805
             </div>
           </div>
 
