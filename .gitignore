@@ -1,5 +1,5 @@
 # Static site / root-level files (not the React app)
-index.html
+/index.html
 /assets/
 impact-teams-updated.json
 site-content.json
