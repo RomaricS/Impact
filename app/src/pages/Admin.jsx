@@ -9,6 +9,7 @@ import { db, storage } from '../lib/firebase';
 import ImageUpload from '../admin/ImageUpload';
 import SponsorsPanel from '../admin/SponsorsPanel';
 import AnnouncementsPanel from '../admin/AnnouncementsPanel';
+import CommunityPanel from '../admin/CommunityPanel';
 
 const TEAM_ORDER = ['12-blue', '14-blue', '16-blue', '16-pink', '17-blue', '18-blue'];
 
@@ -637,6 +638,7 @@ export default function AdminPage({ toast }) {
     { id: 'teams',         label: 'Teams',          icon: '🏐' },
     { id: 'sponsors',      label: 'Sponsors',       icon: '🤝' },
     { id: 'announcements', label: 'Announcements',  icon: '📢' },
+    { id: 'community',     label: 'Community',      icon: '🌱' },
     { id: 'settings',      label: 'Settings',       icon: '⚙' },
   ];
 
@@ -743,6 +745,7 @@ export default function AdminPage({ toast }) {
         )}
         {view === 'sponsors'      && <SponsorsPanel      toast={toast} />}
         {view === 'announcements' && <AnnouncementsPanel toast={toast} />}
+        {view === 'community'     && <CommunityPanel    toast={toast} />}
       </div>
     </div>
   );

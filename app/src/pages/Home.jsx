@@ -7,6 +7,7 @@ import Tryouts from '../components/Tryouts';
 import Programs from '../components/Programs';
 import Fees from '../components/Fees';
 import Sponsors from '../components/Sponsors';
+import Community from '../components/Community';
 import Footer from '../components/Footer';
 import { useTeams } from '../hooks/useTeams';
 
@@ -24,6 +25,7 @@ export default function Home({ theme, toggleTheme }) {
       <Programs />
       <Fees />
       <Sponsors />
+      <Community />
       <Footer />
     </>
   );
