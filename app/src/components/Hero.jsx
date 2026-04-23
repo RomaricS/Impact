@@ -20,7 +20,7 @@ export default function Hero() {
 
         <div className="hero-layout">
           <div className="hero-text">
-            <div className="eyebrow">Fort Wayne, IN · Est. 2020</div>
+            <div className="eyebrow">Fort Wayne, IN · Est. 2022</div>
             <h1>
               IMPACT<br />
               <span className="grad">LEGENDS</span><br />

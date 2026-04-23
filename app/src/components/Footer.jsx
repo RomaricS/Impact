@@ -79,7 +79,7 @@ export default function Footer() {
         </div>
 
         <div className="foot-bottom">
-          <p>© {year} Impact <em>Legends</em> Volleyball Club · Fort Wayne, IN</p>
+          <p>© {year} Impact <em>Legends</em> Volleyball Club · Fort Wayne, IN 46805</p>
           <p>Built with <em>♥</em></p>
         </div>
       </div>
