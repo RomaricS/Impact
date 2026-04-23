@@ -42,11 +42,13 @@ export default function Community() {
           </div>
 
           {/* Right column */}
-          <div className="comm-right">
-            <div className="comm-img-card" style={{ background: c.imageBg || '#1e3a2f' }}>
-              {c.imageUrl && <img src={c.imageUrl} alt={c.headline} />}
+          {c.imageUrl && (
+            <div className="comm-right">
+              <div className="comm-img-card" style={{ background: c.imageBg || '#1e3a2f' }}>
+                <img src={c.imageUrl} alt={c.headline} />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Slider controls — only shown for 2+ campaigns */}
