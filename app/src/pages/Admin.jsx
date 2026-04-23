@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
 import { db, storage } from '../lib/firebase';
 import ImageUpload from '../admin/ImageUpload';
+import SponsorsPanel from '../admin/SponsorsPanel';
+import AnnouncementsPanel from '../admin/AnnouncementsPanel';
 
 const TEAM_ORDER = ['12-blue', '14-blue', '16-blue', '16-pink', '17-blue', '18-blue'];
 
@@ -619,9 +621,11 @@ export default function AdminPage({ toast }) {
   const selectedTeam = selectedTeamId ? teams[selectedTeamId] : null;
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard',  icon: '⊞' },
-    { id: 'teams',     label: 'Teams',       icon: '🏐' },
-    { id: 'settings',  label: 'Settings',    icon: '⚙' },
+    { id: 'dashboard',     label: 'Dashboard',     icon: '⊞' },
+    { id: 'teams',         label: 'Teams',          icon: '🏐' },
+    { id: 'sponsors',      label: 'Sponsors',       icon: '🤝' },
+    { id: 'announcements', label: 'Announcements',  icon: '📢' },
+    { id: 'settings',      label: 'Settings',       icon: '⚙' },
   ];
 
   return (
@@ -725,6 +729,8 @@ export default function AdminPage({ toast }) {
         {view === 'settings' && (
           <SettingsPage teams={teams} toast={toast} />
         )}
+        {view === 'sponsors'      && <SponsorsPanel      toast={toast} />}
+        {view === 'announcements' && <AnnouncementsPanel toast={toast} />}
       </div>
     </div>
   );
