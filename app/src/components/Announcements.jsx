@@ -6,7 +6,7 @@ const TAG_EMOJI = { Signing: '🎓', Tournament: '🏆', Announcement: '📋', A
 
 export default function Announcements() {
   const { announcements, loading } = useAnnouncements(10);
-  const ref = useReveal([loading]);
+  const ref = useReveal([loading, announcements.length]);
 
   if (!loading && announcements.length === 0) return null;
 
