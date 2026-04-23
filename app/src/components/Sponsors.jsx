@@ -1,5 +1,6 @@
 import { useReveal } from '../hooks/useReveal';
 import { useSponsors } from '../hooks/useSponsors';
+import content from '../content.json';
 
 const TIER_CLASSES = ['t-kill', 't-ace', 't-block'];
 
@@ -11,9 +12,9 @@ export default function Sponsors() {
     <section className="sec sponsors-sec" id="sponsors" ref={ref}>
       <div className="container">
         <div className="rv">
-          <div className="sec-eye">2026 Partners</div>
-          <h2 className="sec-title">Our<br />Sponsors</h2>
-          <p className="sec-sub">These businesses make our club possible. Please support them.</p>
+          <div className="sec-eye">{content.sponsors.eyebrow}</div>
+          <h2 className="sec-title">{content.sponsors.titlePlain}<br /><span style={{ color: 'var(--pink)' }}>{content.sponsors.titleHighlight}</span></h2>
+          <p className="sec-sub">{content.sponsors.subtitle}</p>
         </div>
 
         <div className="tier-row">
@@ -38,10 +39,10 @@ export default function Sponsors() {
 
         <div className="become-sponsor rv">
           <div>
-            <h3>Become a Sponsor</h3>
-            <p>Support youth athletics in Fort Wayne and get your brand in front of our community.</p>
+            <h3>{content.sponsors.becomeTitle}</h3>
+            <p>{content.sponsors.becomeDescription}</p>
           </div>
-          <a href="mailto:info@impactvbcfw.com" className="btn btn-p">Contact Us</a>
+          <a href={`mailto:${content.sponsors.contactEmail}`} className="btn btn-p">{content.sponsors.becomeCta}</a>
         </div>
       </div>
     </section>

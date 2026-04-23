@@ -1,37 +1,8 @@
+import content from '../content.json';
+
 export default function Footer() {
   const year = new Date().getFullYear();
-  const cols = [
-    {
-      title: 'Teams',
-      links: [
-        { label: '12 Blue', id: 'teams' },
-        { label: '14 Blue', id: 'teams' },
-        { label: '16 Blue', id: 'teams' },
-        { label: '16 Pink', id: 'teams' },
-        { label: '17 Blue', id: 'teams' },
-        { label: '18 Blue', id: 'teams' },
-      ],
-    },
-    {
-      title: 'Club',
-      links: [
-        { label: 'About', id: 'about' },
-        { label: 'Programs', id: 'programs' },
-        { label: 'Tryouts', id: 'tryouts' },
-        { label: 'Sponsors', id: 'sponsors' },
-        { label: 'Club Fees', id: 'fees' },
-      ],
-    },
-    {
-      title: 'External',
-      links: [
-        { label: 'Schedules & Results', href: 'https://www.advancedeventsystems.com' },
-        { label: 'Register (Tryouts)', href: 'https://forms.gle/zmnEhvmebK5z3JJw9' },
-        { label: 'Facebook', href: 'https://www.facebook.com/impactvolleyballclubfw/' },
-        { label: 'Instagram', href: 'https://www.instagram.com/impactlegendsvbc?igsh=YWhuNGozaGt0cm5m&utm_source=qr' },
-      ],
-    },
-  ];
+  const cols = content.footer.columns;
 
   function scrollTo(id) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -42,16 +13,16 @@ export default function Footer() {
       <div className="container">
         <div className="foot-top">
           <div className="foot-brand">
-            <div className="logo">IMPACT <em>LEGENDS</em></div>
-            <p>Premier youth volleyball club in Fort Wayne, Indiana. Developing elite athletes and legendary character.</p>
-            <p>2525 Florida Drive, Fort Wayne, IN 46805</p>
+            <div className="logo">{content.footer.logo.split(' ')[0]} <em>{content.footer.logo.split(' ')[1]}</em></div>
+            <p>{content.footer.tagline}</p>
+            <p>{content.footer.address}</p>
             <div className="socials">
-              <a href="https://www.facebook.com/impactvolleyballclubfw/" className="soc" title="Facebook" target="_blank" rel="noreferrer">
+              <a href={content.footer.facebookUrl} className="soc" title="Facebook" target="_blank" rel="noreferrer">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                 </svg>
               </a>
-              <a href="https://www.instagram.com/impactlegendsvbc?igsh=YWhuNGozaGt0cm5m&utm_source=qr" className="soc" title="Instagram" target="_blank" rel="noreferrer">
+              <a href={content.footer.instagramUrl} className="soc" title="Instagram" target="_blank" rel="noreferrer">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="2" y="2" width="20" height="20" rx="5"/>
                   <circle cx="12" cy="12" r="4"/>
@@ -79,7 +50,7 @@ export default function Footer() {
         </div>
 
         <div className="foot-bottom">
-          <p>© {year} Impact <em>Legends</em> Volleyball Club · Fort Wayne, IN 46805</p>
+          <p>© {year} {content.footer.copyright}</p>
           <p>Built with <em>♥</em></p>
         </div>
       </div>

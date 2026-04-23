@@ -1,14 +1,7 @@
+import content from '../content.json';
+
 export default function Hero() {
-  const stats = [
-    { num: '6', lbl: 'Club Teams' },
-    { num: '50+', lbl: 'Players' },
-    { num: '2026', lbl: 'Season' },
-    { num: 'FW', lbl: 'Fort Wayne · Indiana' },
-    { num: '6', lbl: 'Club Teams' },
-    { num: '50+', lbl: 'Players' },
-    { num: '2026', lbl: 'Season' },
-    { num: 'FW', lbl: 'Fort Wayne · Indiana' },
-  ];
+  const stats = [...content.hero.stats, ...content.hero.stats];
 
   return (
     <>
@@ -20,24 +13,23 @@ export default function Hero() {
 
         <div className="hero-layout">
           <div className="hero-text">
-            <div className="eyebrow">Fort Wayne, IN · Est. 2022</div>
+            <div className="eyebrow">{content.hero.eyebrow}</div>
             <h1>
-              IMPACT<br />
-              <span className="grad">LEGENDS</span><br />
-              VBC
+              {content.hero.titleLine1}<br />
+              <span className="grad">{content.hero.titleLine2}</span><br />
+              {content.hero.titleLine3}
             </h1>
             <p className="hero-sub">
-              Premier volleyball club developing elite athletes across northeast Indiana.
-              Six age divisions. One relentless standard.
+              {content.hero.subtitle}
             </p>
             <div className="cta-row">
               <a href="#tryouts" className="btn btn-p"
                  onClick={e => { e.preventDefault(); document.getElementById('tryouts')?.scrollIntoView({ behavior: 'smooth' }); }}>
-                Register for Tryouts →
+                {content.hero.ctaPrimary}
               </a>
               <a href="#teams" className="btn btn-g"
                  onClick={e => { e.preventDefault(); document.getElementById('teams')?.scrollIntoView({ behavior: 'smooth' }); }}>
-                View Teams
+                {content.hero.ctaSecondary}
               </a>
             </div>
           </div>
@@ -92,7 +84,7 @@ export default function Hero() {
         </div>
 
         <div className="scroll-hint">
-          <span>Scroll</span>
+          <span>{content.hero.scroll}</span>
           <div className="scroll-line" />
         </div>
       </section>

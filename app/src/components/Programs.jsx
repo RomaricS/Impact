@@ -1,23 +1,5 @@
 import { useReveal } from '../hooks/useReveal';
-
-const PROGRAMS = [
-  {
-    icon: '🏐',
-    title: 'Club Volleyball',
-    desc: 'Competitive club teams for players ages 12–18. Six divisions spanning Blue and Pink brackets, competing in regional and national tournaments across the Midwest.',
-    feat: true,
-  },
-  {
-    icon: '🎓',
-    title: 'Recruiting',
-    desc: 'We actively support college-bound athletes with recruiting resources, film, and coach connections.',
-  },
-  {
-    icon: '⛺',
-    title: 'Camps & Clinics',
-    desc: 'Youth development camps and position-specific clinics open to all skill levels throughout the year.',
-  },
-];
+import content from '../content.json';
 
 export default function Programs() {
   const ref = useReveal();
@@ -25,16 +7,16 @@ export default function Programs() {
     <section className="sec" id="programs" style={{ background: 'var(--bg)' }} ref={ref}>
       <div className="container">
         <div className="rv">
-          <div className="sec-eye">What We Offer</div>
-          <h2 className="sec-title">Programs</h2>
-          <p className="sec-sub">From first-time club players to college-bound athletes — we have a program for every level.</p>
+          <div className="sec-eye">{content.programs.eyebrow}</div>
+          <h2 className="sec-title">{content.programs.title}</h2>
+          <p className="sec-sub">{content.programs.subtitle}</p>
         </div>
         <div className="programs-grid rv">
-          {PROGRAMS.map(p => (
-            <div key={p.title} className={`prog-card ${p.feat ? 'feat' : ''}`}>
+          {content.programs.items.map(p => (
+            <div key={p.title} className={`prog-card ${p.featured ? 'feat' : ''}`}>
               <span className="prog-icon">{p.icon}</span>
               <div className="prog-title">{p.title}</div>
-              <p className="prog-desc">{p.desc}</p>
+              <p className="prog-desc">{p.description}</p>
             </div>
           ))}
         </div>

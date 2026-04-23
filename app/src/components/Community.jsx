@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useReveal } from '../hooks/useReveal';
 import { useCommunity } from '../hooks/useCommunity';
+import content from '../content.json';
 
 export default function Community() {
   const { campaigns, loading } = useCommunity();
@@ -20,7 +21,7 @@ export default function Community() {
         <div className="comm-grid rv">
           {/* Left column */}
           <div className="comm-left">
-            <div className="sec-eye">Community</div>
+            <div className="sec-eye">{content.community.eyebrow}</div>
             <h2 className="comm-headline">{c.headline}</h2>
             {c.description && <p className="comm-desc">{c.description}</p>}
             {c.steps?.length > 0 && (
@@ -36,7 +37,7 @@ export default function Community() {
             {c.linkUrl && (
               <a href={c.linkUrl} target="_blank" rel="noreferrer"
                  className="btn btn-p" style={{ marginTop: '2rem', display: 'inline-flex' }}>
-                {c.linkLabel || 'Learn More'} →
+                {c.linkLabel || content.community.defaultLinkLabel} →
               </a>
             )}
           </div>

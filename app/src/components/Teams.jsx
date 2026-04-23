@@ -1,6 +1,7 @@
 import { useReveal } from '../hooks/useReveal';
 import TeamDrawer from './TeamDrawer';
 import { useState } from 'react';
+import content from '../content.json';
 
 const TEAM_ORDER = ['12-blue', '14-blue', '16-blue', '16-pink', '17-blue', '18-blue'];
 
@@ -15,10 +16,10 @@ export default function Teams({ teams, loading }) {
       <div className="container">
         <div className="teams-hdr rv">
           <div>
-            <div className="sec-eye">Club Teams</div>
-            <h2 className="sec-title">Our<br />Teams</h2>
+            <div className="sec-eye">{content.teams.eyebrow}</div>
+            <h2 className="sec-title">{content.teams.titlePlain}<br />{content.teams.titleHighlight}</h2>
           </div>
-          <p className="sec-sub">Six competitive divisions developing elite players from 12U through 18U across northeast Indiana.</p>
+          <p className="sec-sub">{content.teams.subtitle}</p>
         </div>
 
         {loading ? (

@@ -1,5 +1,6 @@
 import { useReveal } from '../hooks/useReveal';
 import { useAnnouncements } from '../hooks/useAnnouncements';
+import content from '../content.json';
 
 const TAG_EMOJI = { Signing: '🎓', Tournament: '🏆', Announcement: '📋', Award: '🏅' };
 
@@ -13,9 +14,9 @@ export default function Announcements() {
     <section className="sec announcements-sec" id="news" ref={ref}>
       <div className="container">
         <div className="rv">
-          <div className="sec-eye">Club News</div>
-          <h2 className="sec-title">Latest <span style={{ color: 'var(--pink)' }}>Updates</span></h2>
-          <p className="sec-sub">News, achievements, and announcements from the club.</p>
+          <div className="sec-eye">{content.announcements.eyebrow}</div>
+          <h2 className="sec-title">{content.announcements.titlePlain} <span style={{ color: 'var(--pink)' }}>{content.announcements.titleHighlight}</span></h2>
+          <p className="sec-sub">{content.announcements.subtitle}</p>
         </div>
 
         {loading ? (
@@ -36,7 +37,7 @@ export default function Announcements() {
                     </div>
                     {post.linkUrl && (
                       <a href={post.linkUrl} target="_blank" rel="noreferrer" className="ann-link">
-                        {post.linkLabel || 'Read more'} →
+                        {post.linkLabel || content.announcements.defaultLinkLabel} →
                       </a>
                     )}
                   </div>
