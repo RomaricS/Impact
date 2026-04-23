@@ -44,7 +44,7 @@ export default function Footer() {
           <div className="foot-brand">
             <div className="logo">IMPACT <em>LEGENDS</em></div>
             <p>Premier youth volleyball club in Fort Wayne, Indiana. Developing elite athletes and legendary character.</p>
-            <p>2525 Florida Drive, Fort Wayne, IN</p>
+            <p>2525 Florida Drive, Fort Wayne, IN 46805</p>
             <div className="socials">
               <a href="https://www.facebook.com/impactvolleyballclubfw/" className="soc" title="Facebook" target="_blank" rel="noreferrer">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
