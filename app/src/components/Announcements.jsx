@@ -4,8 +4,8 @@ import { useAnnouncements } from '../hooks/useAnnouncements';
 const TAG_EMOJI = { Signing: '🎓', Tournament: '🏆', Announcement: '📋', Award: '🏅' };
 
 export default function Announcements() {
-  const ref = useReveal();
   const { announcements, loading } = useAnnouncements(10);
+  const ref = useReveal([loading]);
 
   if (!loading && announcements.length === 0) return null;
 
