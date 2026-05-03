@@ -51,14 +51,14 @@
     "eyebrow": "Join the Club",
     "titlePlain": "Tryouts",
     "titleHighlight": "2026–27",
-    "description": "Open to players 12–18. Register online before arriving. Spots are limited — don't miss your chance to wear the jersey.",
+    "description": "Tryouts will be held Wednesday, July 1 and Thursday, July 2. Can't make it? Register and email us at legendssportsacademyfw@gmail.com — secondary tryouts later in July, with a final tryout in October to fill remaining spots.",
     "feeAmount": "$40",
     "feeLabel": "tryout fee · payable at event or via Venmo/PayPal",
     "cta": "Register Now →",
     "locationsHeading": "Locations",
-    "locationsNote": "If smaller group, tryout times may be shorter.",
+    "locationsNote": "6:00–7:30 PM · Ages 14 & under  ·  7:30–9:00 PM · Ages 15 & older",
     "locations": [
-      { "name": "Saint Aloysius School", "address": "14623 Bluffton Road, Yoder, IN 46798" }
+      { "name": "Saint Aloysius School", "address": "14623 Bluffton Rd, Yoder, IN 46798" }
     ]
   },
   "programs": {
