@@ -28,9 +28,27 @@ export default function Tryouts() {
           </div>
 
           <div className="rv" style={{ animationDelay: '0.15s' }}>
-            <p style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.9rem' }}>
-              {content.tryouts.locationsHeading}
-            </p>
+            <p className="tryout-section-lbl">{content.tryouts.datesHeading}</p>
+            <div className="tryout-dates">
+              {content.tryouts.dates.map(d => (
+                <div key={d.date + d.month} className="tryout-date-card">
+                  <span className="tdc-day">{d.day}</span>
+                  <span className="tdc-num">{d.date}</span>
+                  <span className="tdc-month">{d.month}</span>
+                </div>
+              ))}
+            </div>
+            <div className="tryout-schedule">
+              {content.tryouts.schedule.map(s => (
+                <div key={s.time} className="tryout-slot">
+                  <span className="slot-time">{s.time}</span>
+                  <span className="slot-sep">·</span>
+                  <span className="slot-ages">{s.ages}</span>
+                </div>
+              ))}
+            </div>
+
+            <p className="tryout-section-lbl" style={{ marginTop: '2rem' }}>{content.tryouts.locationsHeading}</p>
             <div className="loc-list">
               {content.tryouts.locations.map(l => (
                 <div key={l.name} className="loc-card">
@@ -38,7 +56,6 @@ export default function Tryouts() {
                   <div className="loc-addr">{l.address}</div>
                 </div>
               ))}
-              <div className="loc-note">{content.tryouts.locationsNote}</div>
             </div>
           </div>
         </div>

@@ -584,6 +584,37 @@ h1 .grad {
 .loc-addr { font-size: 0.82rem; color: var(--muted); padding-left: 1.3rem; }
 .loc-note { font-size: 0.78rem; color: var(--muted); padding-left: 1.3rem; margin-top: 1rem; font-style: italic; }
 
+.tryout-section-lbl { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.9rem; }
+.tryout-dates { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+.tryout-date-card {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--pink);
+  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+.tdc-day { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--pink); }
+.tdc-num { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; line-height: 1; color: var(--fg); letter-spacing: 0.02em; }
+.tdc-month { font-size: 0.78rem; font-weight: 600; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+.tryout-schedule { display: flex; flex-direction: column; gap: 0.6rem; }
+.tryout-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1.2rem;
+}
+.slot-time { font-weight: 700; font-size: 0.92rem; white-space: nowrap; }
+.slot-sep { color: var(--pink); font-size: 1.1rem; flex-shrink: 0; }
+.slot-ages { font-size: 0.88rem; color: var(--muted); }
+
 /* PROGRAMS */
 .programs-grid { display: grid; grid-template-columns: 5fr 3fr 3fr; gap: 1rem; margin-top: 3rem; }
 .prog-card {
