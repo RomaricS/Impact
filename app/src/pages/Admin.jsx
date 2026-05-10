@@ -5,6 +5,7 @@ import { usePayments } from '../hooks/usePayments';
 import { useSettings } from '../hooks/useSettings';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../lib/firebase';
 import ImageUpload from '../admin/ImageUpload';
 import SponsorsPanel from '../admin/SponsorsPanel';
@@ -437,10 +438,14 @@ function TeamEditorPage({ team, onBack, onSave, toast }) {
 /* ─── Settings page ─── */
 function SettingsPage({ teams, toast }) {
   const importRef = useRef(null);
+  const pdfRef = useRef(null);
   const [importing, setImporting] = useState(false);
-  const { qrs } = usePayments();
+  const { qrs, pdfUrl } = usePayments();
   const [qrDraft, setQrDraft] = useState(null);
   const [savingQr, setSavingQr] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [currentPdf, setCurrentPdf] = useState('');
+  useEffect(() => { setCurrentPdf(pdfUrl); }, [pdfUrl]);
   const { settings } = useSettings();
   const [regLink, setRegLink] = useState('');
   const [savingReg, setSavingReg] = useState(false);
@@ -479,6 +484,32 @@ function SettingsPage({ teams, toast }) {
     } finally {
       setSavingQr(false);
     }
+  }
+
+  async function handlePdfUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file || file.type !== 'application/pdf') { toast('Please select a PDF file', 'error'); return; }
+    setUploadingPdf(true);
+    try {
+      const storageRef = ref(storage, `fee-schedule-${Date.now()}.pdf`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      await setDoc(doc(db, 'settings', 'payments'), { feeSchedulePdf: url }, { merge: true });
+      setCurrentPdf(url);
+      toast('Fee schedule PDF updated ✓');
+    } catch (err) {
+      console.error(err);
+      toast('Upload failed', 'error');
+    } finally {
+      setUploadingPdf(false);
+      e.target.value = '';
+    }
+  }
+
+  async function clearPdf() {
+    await setDoc(doc(db, 'settings', 'payments'), { feeSchedulePdf: '' }, { merge: true });
+    setCurrentPdf('');
+    toast('PDF removed ✓');
   }
 
   function handleExport() {
@@ -589,6 +620,27 @@ function SettingsPage({ teams, toast }) {
             </div>
           </>
         )}
+      </div>
+
+      {/* ── Fee Schedule PDF ── */}
+      <div className="admin-card">
+        <div className="admin-card-title">Fee Schedule PDF</div>
+        <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '1.25rem', lineHeight: 1.7 }}>
+          Upload the fee schedule PDF. A download button will appear in the Fees section of the public site.
+        </p>
+        {currentPdf && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.83rem' }}>
+            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--muted)' }}>
+              📄 Fee schedule on file
+            </span>
+            <a href={currentPdf} target="_blank" rel="noreferrer" className="admin-btn admin-btn-ghost admin-btn-sm">View</a>
+            <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={clearPdf}>Remove</button>
+          </div>
+        )}
+        <input ref={pdfRef} type="file" accept=".pdf,application/pdf" style={{ display: 'none' }} onChange={handlePdfUpload} />
+        <button className="admin-btn admin-btn-primary" onClick={() => pdfRef.current?.click()} disabled={uploadingPdf}>
+          {uploadingPdf ? 'Uploading…' : currentPdf ? '↑ Replace PDF' : '↑ Upload PDF'}
+        </button>
       </div>
 
       <div className="admin-card">

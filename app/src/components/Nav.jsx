@@ -19,7 +19,10 @@ export default function Nav({ toggleTheme, theme, onTeamsClick, onTryoutsClick }
   return (
     <>
       <nav className={scrolled ? 'scrolled' : ''}>
-        <a className="nav-logo" href="/">{content.nav.logo.split(' ')[0]} <em>{content.nav.logo.split(' ')[1]}</em></a>
+        <a className="nav-logo" href="/">
+          <img src="/logo.png" alt="" className="nav-logo-img" />
+          {content.nav.logo.split(' ')[0]} <em>{content.nav.logo.split(' ')[1]}</em>
+        </a>
 
         <ul className="nav-links">
           {content.nav.links.map(l => (

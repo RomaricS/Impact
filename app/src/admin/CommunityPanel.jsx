@@ -3,11 +3,14 @@ import { collection, doc, addDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useCommunity } from '../hooks/useCommunity';
 import ImageUpload from './ImageUpload';
+import FileUpload from './FileUpload';
 
 const EMPTY_FORM = {
   headline: '', description: '', steps: [''],
   imageUrl: '', imageBg: '#1e3a2f',
-  linkUrl: '', linkLabel: '', order: 0,
+  linkUrl: '', linkLabel: '',
+  fileUrl: '', fileLabel: '',
+  order: 0,
 };
 
 export default function CommunityPanel({ toast }) {
@@ -172,6 +175,20 @@ export default function CommunityPanel({ toast }) {
               </div>
             </div>
 
+            <div className="form-group">
+              <label className="form-label">Downloadable File (optional)</label>
+              <FileUpload value={form.fileUrl}
+                          onChange={url => setForm(f => ({ ...f, fileUrl: url }))}
+                          path="community/file" />
+            </div>
+            {form.fileUrl && (
+              <div className="form-group">
+                <label className="form-label">File Button Label</label>
+                <input className="form-input" value={form.fileLabel}
+                       onChange={e => setForm(f => ({ ...f, fileLabel: e.target.value }))}
+                       placeholder="Download Info Sheet" />
+              </div>
+            )}
             <div className="admin-actions">
               <button className="admin-btn admin-btn-primary" onClick={save} disabled={saving}>
                 {saving ? 'Saving…' : 'Save Campaign'}

@@ -43,11 +43,23 @@ export default function Community() {
           </div>
 
           {/* Right column */}
-          {c.imageUrl && (
+          {(c.imageUrl || c.fileUrl) && (
             <div className="comm-right">
-              <div className="comm-img-card" style={{ background: c.imageBg || '#1e3a2f' }}>
-                <img src={c.imageUrl} alt={c.headline} />
-              </div>
+              {c.imageUrl && (
+                <div className="comm-img-card" style={{ background: c.imageBg || '#1e3a2f' }}>
+                  <img src={c.imageUrl} alt={c.headline} />
+                </div>
+              )}
+              {c.fileUrl && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                  <a href={c.fileUrl} target="_blank" rel="noreferrer" className="ann-file-btn" style={{ fontSize: '0.75rem', padding: '0.4rem 0.9rem' }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M12 3v13M5 15l7 7 7-7"/><line x1="3" y1="22" x2="21" y2="22"/>
+                    </svg>
+                    {c.fileLabel || 'Download'}
+                  </a>
+                </div>
+              )}
             </div>
           )}
         </div>

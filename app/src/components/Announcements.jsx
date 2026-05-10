@@ -40,6 +40,16 @@ export default function Announcements() {
                         {post.linkLabel || content.announcements.defaultLinkLabel} →
                       </a>
                     )}
+                    {post.fileUrl && (
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.75rem' }}>
+                        <a href={post.fileUrl} target="_blank" rel="noreferrer" className="ann-file-btn">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M12 3v13M5 15l7 7 7-7"/><line x1="3" y1="22" x2="21" y2="22"/>
+                          </svg>
+                          {post.fileLabel || 'Download'}
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

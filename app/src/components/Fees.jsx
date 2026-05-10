@@ -4,7 +4,7 @@ import content from '../content.json';
 
 export default function Fees() {
   const ref = useReveal();
-  const { qrs } = usePayments();
+  const { qrs, pdfUrl } = usePayments();
 
   return (
     <section className="sec fees-sec" id="fees" ref={ref}>
@@ -37,6 +37,20 @@ export default function Fees() {
               <strong>{content.fees.mailTitle}</strong>
               {content.fees.mailAddress}
             </div>
+
+            {pdfUrl && (
+              <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border)' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--muted)', lineHeight: 1.65, marginBottom: '0.9rem' }}>
+                  Full breakdown of team costs and monthly payment installments for the 2027 season.
+                </div>
+                <a href={pdfUrl} target="_blank" rel="noreferrer" className="btn btn-p">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}>
+                    <path d="M12 3v13M5 15l7 7 7-7"/><line x1="3" y1="22" x2="21" y2="22"/>
+                  </svg>
+                  2027 Fee Schedule
+                </a>
+              </div>
+            )}
           </div>
 
           <div className="qr-card rv" style={{ animationDelay: '0.15s' }}>

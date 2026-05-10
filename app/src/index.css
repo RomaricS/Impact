@@ -86,8 +86,16 @@ nav.scrolled {
   letter-spacing: 0.1em;
   color: var(--fg);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 .nav-logo em { color: var(--pink); font-style: normal; }
+.nav-logo-img {
+  height: 42px;
+  width: auto;
+  display: block;
+}
 .nav-links {
   list-style: none;
   display: flex;
@@ -1379,6 +1387,8 @@ footer {
 .ann-tag { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,31,109,0.1); color: var(--pink); padding: 0.15rem 0.5rem; border-radius: 100px; }
 .ann-link { display: inline-block; font-size: 0.78rem; font-weight: 600; color: var(--pink); text-decoration: none; margin-top: 0.65rem; }
 .ann-link:hover { text-decoration: underline; }
+.ann-file-btn { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; color: var(--pink); text-decoration: none; padding: 0.3rem 0.7rem; border-radius: 100px; border: 1px solid rgba(255,31,109,0.3); background: rgba(255,31,109,0.06); transition: background 0.2s, border-color 0.2s; }
+.ann-file-btn:hover { background: rgba(255,31,109,0.12); border-color: rgba(255,31,109,0.5); }
 
 /* COMMUNITY (campaign slider) */
 .community-sec { background: var(--bg2); }
