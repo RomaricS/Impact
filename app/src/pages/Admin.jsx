@@ -4,15 +4,14 @@ import { useTeams } from '../hooks/useTeams';
 import { usePayments } from '../hooks/usePayments';
 import { useSettings } from '../hooks/useSettings';
 import { useNavigate } from 'react-router-dom';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../lib/firebase';
+import { sortTeams, nextOrder } from '../lib/teamOrder';
 import ImageUpload from '../admin/ImageUpload';
 import SponsorsPanel from '../admin/SponsorsPanel';
 import AnnouncementsPanel from '../admin/AnnouncementsPanel';
 import CommunityPanel from '../admin/CommunityPanel';
-
-const TEAM_ORDER = ['12-blue', '14-blue', '16-blue', '16-pink', '17-blue', '18-blue'];
 
 /* ─── Small helpers ─── */
 function genId() { return Math.random().toString(36).slice(2, 9); }
@@ -395,9 +394,85 @@ function CoachEditor({ team, onSave }) {
   );
 }
 
+/* ─── Team details editor ─── */
+function DetailsEditor({ team, onSave, onDelete }) {
+  const [form, setForm] = useState({
+    name: team.name || '',
+    sub: team.sub || '',
+    division: team.division || '',
+    color: team.color || 'blue',
+    order: team.order ?? '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    if (!form.name.trim()) return;
+    setSaving(true);
+    await onSave({
+      name: form.name.trim(),
+      sub: form.sub.trim(),
+      division: form.division.trim(),
+      color: form.color,
+      order: Number(form.order) || 0,
+    });
+    setSaving(false);
+  }
+
+  return (
+    <div className="admin-form">
+      <div className="form-row">
+        <div className="form-group">
+          <label className="form-label">Team Title / Name</label>
+          <input className="form-input" value={form.name} placeholder="e.g. 12 Blue"
+                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Subtitle</label>
+          <input className="form-input" value={form.sub} placeholder="e.g. Ages 12 & Under"
+                 onChange={e => setForm(f => ({ ...f, sub: e.target.value }))} />
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label className="form-label">Division (pill label)</label>
+          <input className="form-input" value={form.division} placeholder="e.g. Blue"
+                 onChange={e => setForm(f => ({ ...f, division: e.target.value }))} />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Color</label>
+          <select className="form-select" value={form.color}
+                  onChange={e => setForm(f => ({ ...f, color: e.target.value }))}>
+            <option value="blue">Blue</option>
+            <option value="pink">Pink</option>
+          </select>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="form-label">Sort Order (lower shows first)</label>
+        <input className="form-input" type="number" value={form.order} placeholder="e.g. 1"
+               onChange={e => setForm(f => ({ ...f, order: e.target.value }))} />
+      </div>
+      <div className="admin-actions">
+        <button className="admin-btn admin-btn-primary" onClick={save} disabled={saving || !form.name.trim()}>
+          {saving ? 'Saving…' : 'Save Details'}
+        </button>
+      </div>
+
+      <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+        <div className="admin-card-title" style={{ color: 'var(--pink)' }}>Danger Zone</div>
+        <p style={{ fontSize: '0.85rem', color: 'var(--muted)', margin: '0.5rem 0 1rem', lineHeight: 1.7 }}>
+          Permanently delete this team and all of its roster, schedule, practices, and coaches.
+          This cannot be undone.
+        </p>
+        <button className="admin-btn admin-btn-danger" onClick={onDelete}>Delete Team</button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Team editor page ─── */
-function TeamEditorPage({ team, onBack, onSave, toast }) {
-  const [tab, setTab] = useState('roster');
+function TeamEditorPage({ team, onBack, onDelete, toast }) {
+  const [tab, setTab] = useState('details');
 
   async function saveField(field, value) {
     try {
@@ -408,7 +483,16 @@ function TeamEditorPage({ team, onBack, onSave, toast }) {
     }
   }
 
-  const tabs = ['roster', 'tournaments', 'practices', 'coaches'];
+  async function saveFields(fields) {
+    try {
+      await setDoc(doc(db, 'teams', team.id), fields, { merge: true });
+      toast('Saved ✓');
+    } catch {
+      toast('Save failed', 'error');
+    }
+  }
+
+  const tabs = ['details', 'roster', 'tournaments', 'practices', 'coaches'];
 
   return (
     <div>
@@ -426,6 +510,7 @@ function TeamEditorPage({ team, onBack, onSave, toast }) {
       </div>
 
       <div className="admin-card">
+        {tab === 'details'     && <DetailsEditor     team={team} onSave={saveFields} onDelete={onDelete} />}
         {tab === 'roster'      && <RosterEditor      team={team} onSave={v => saveField('roster', v)} />}
         {tab === 'tournaments' && <TournamentEditor  team={team} onSave={v => saveField('tournaments', v)} />}
         {tab === 'practices'   && <PracticeEditor    team={team} onSave={v => saveField('practices', v)} />}
@@ -682,7 +767,40 @@ export default function AdminPage({ toast }) {
     navigate('/admin/login');
   }
 
-  const sorted = TEAM_ORDER.map(id => teams[id]).filter(Boolean);
+  async function handleAddTeam() {
+    const id = genId();
+    try {
+      await setDoc(doc(db, 'teams', id), {
+        name: 'New Team',
+        sub: '',
+        division: 'Blue',
+        color: 'blue',
+        order: nextOrder(teams),
+        roster: [],
+        coaches: [],
+        practices: [],
+        tournaments: [],
+      });
+      setSelectedTeamId(id);
+      setView('teams');
+      toast('Team created — edit its details ✓');
+    } catch {
+      toast('Could not create team', 'error');
+    }
+  }
+
+  async function handleDeleteTeam(team) {
+    if (!window.confirm(`Delete "${team.name}"? This permanently removes its roster, schedule, practices, and coaches. This cannot be undone.`)) return;
+    try {
+      await deleteDoc(doc(db, 'teams', team.id));
+      setSelectedTeamId(null);
+      toast('Team deleted ✓');
+    } catch {
+      toast('Delete failed', 'error');
+    }
+  }
+
+  const sorted = sortTeams(teams);
   const selectedTeam = selectedTeamId ? teams[selectedTeamId] : null;
 
   const navItems = [
@@ -766,8 +884,13 @@ export default function AdminPage({ toast }) {
         {/* Teams list */}
         {view === 'teams' && !selectedTeam && (
           <div>
-            <div className="admin-page-title">Teams</div>
-            <div className="admin-page-sub">Select a team to manage its roster, schedule, practices, and coaches.</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+              <div>
+                <div className="admin-page-title">Teams</div>
+                <div className="admin-page-sub">Select a team to manage it, or add a new one.</div>
+              </div>
+              <button className="admin-btn admin-btn-primary" onClick={handleAddTeam}>+ Add Team</button>
+            </div>
             {loading ? <div className="admin-empty">Loading…</div> : (
               <div className="admin-grid">
                 {sorted.map(t => (
@@ -787,6 +910,7 @@ export default function AdminPage({ toast }) {
           <TeamEditorPage
             team={selectedTeam}
             onBack={() => setSelectedTeamId(null)}
+            onDelete={() => handleDeleteTeam(selectedTeam)}
             toast={toast}
           />
         )}

@@ -2,14 +2,13 @@ import { useReveal } from '../hooks/useReveal';
 import TeamDrawer from './TeamDrawer';
 import { useState } from 'react';
 import content from '../content.json';
-
-const TEAM_ORDER = ['12-blue', '14-blue', '16-blue', '16-pink', '17-blue', '18-blue'];
+import { sortTeams } from '../lib/teamOrder';
 
 export default function Teams({ teams, loading }) {
   const ref = useReveal([loading]);
   const [activeTeam, setActiveTeam] = useState(null);
 
-  const sorted = TEAM_ORDER.map(id => teams[id]).filter(Boolean);
+  const sorted = sortTeams(teams);
 
   return (
     <section className="sec" id="teams" style={{ background: 'var(--bg)' }} ref={ref}>
