@@ -13,7 +13,7 @@ export default function Footer() {
       <div className="container">
         <div className="foot-top">
           <div className="foot-brand">
-            <div className="logo">{content.footer.logo.split(' ')[0]} <em>{content.footer.logo.split(' ')[1]}</em></div>
+            <img src="/logo.png" alt={content.footer.logo} className="foot-logo-img" />
             <p>{content.footer.tagline}</p>
             <p>{content.footer.address}</p>
             <div className="socials">
@@ -32,26 +32,28 @@ export default function Footer() {
             </div>
           </div>
 
-          {cols.map(col => (
-            <div key={col.title} className="foot-col">
-              <h4>{col.title}</h4>
-              <ul>
-                {col.links.map(l => (
-                  <li key={l.label}>
-                    {l.href
-                      ? <a href={l.href} target="_blank" rel="noreferrer">{l.label}</a>
-                      : <a onClick={() => scrollTo(l.id)} style={{ cursor: 'pointer' }}>{l.label}</a>
-                    }
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="foot-cols">
+            {cols.map(col => (
+              <div key={col.title} className="foot-col">
+                <h4>{col.title}</h4>
+                <ul>
+                  {col.links.map(l => (
+                    <li key={l.label}>
+                      {l.href
+                        ? <a href={l.href} target="_blank" rel="noreferrer">{l.label}</a>
+                        : <a onClick={() => scrollTo(l.id)} style={{ cursor: 'pointer' }}>{l.label}</a>
+                      }
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="foot-bottom">
           <p>© {year} {content.footer.copyright}</p>
-          <p>Built with <em>♥</em></p>
+          <a href="/admin/login" className="foot-admin-link">Admin sign in</a>
         </div>
       </div>
     </footer>
