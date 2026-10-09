@@ -42,6 +42,74 @@
   --svg-lbl:     rgba(8,12,28,0.45);
 }
 
+/* === New design-system tokens (design/tokens.css). Additive during the
+   rework: old variables above remain defined and in use by components not
+   yet restyled. --pink and --muted are shared names between the two
+   systems — these blocks come after the old ones, so they win the cascade
+   and every component immediately picks up the new brand pink / muted
+   text colour, in both themes. Everything else here is a brand-new name,
+   so nothing else changes yet. === */
+:root {
+  --ground: #F3F5F7;
+  --surface: #FFFFFF;
+  --ink: #0D1117;
+  --body: #3A4350;
+  --muted: #56606E;
+  --line: #DDE2E8;
+  --line2: #B6BEC9;
+  --chip: #E9ECF0;
+  --inv-bg: #0D1117;
+  --inv-fg: #FFFFFF;
+  --pink: #E84388;
+  --sky: #55AEEB;
+  --on-accent: #0D1117;
+  --blue-ink: #1A73C8;
+  --blue-tint: #DCEEFB;
+  --blue-tint-ink: #0F4F8A;
+  --pink-tint: #FCE7F0;
+  --pink-tint-ink: #A80F4B;
+  --band-bg: #0D1117;
+  --band-fg: #FFFFFF;
+  --dot1: #E84388;
+  --dot2: #55AEEB;
+  --panel: #0D1117;
+  --logo-bg: transparent;
+  --danger: #A3162A;
+  --danger-ink: #8A1222;
+  --danger-line: #F3B6BD;
+  --warn-bg: #FFF6DF;
+  --warn-line: #F0C36D;
+  --ok: #1F8A4C;
+}
+
+[data-theme="dark"] {
+  --ground: #0B0F15;
+  --surface: #151B24;
+  --ink: #F2F5F8;
+  --body: #C3CBD6;
+  --muted: #9AA6B5;
+  --line: #283140;
+  --line2: #3B4657;
+  --chip: #232C39;
+  --inv-bg: #F2F5F8;
+  --inv-fg: #0D1117;
+  --blue-ink: #6DBBF0;
+  --blue-tint: #15324B;
+  --blue-tint-ink: #9BD2F8;
+  --pink-tint: #47162C;
+  --pink-tint-ink: #F9A8CB;
+  --band-bg: #E84388;
+  --band-fg: #0D1117;
+  --dot1: #0D1117;
+  --dot2: #FFFFFF;
+  --panel: #151B24;
+  --logo-bg: #FFFFFF;
+  --danger-ink: #FF9AA5;
+  --danger-line: #5A1F27;
+  --warn-bg: #33290F;
+  --warn-line: #7A5E16;
+}
+
 html { scroll-behavior: smooth; }
 body {
   background: var(--bg);
