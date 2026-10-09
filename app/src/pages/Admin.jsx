@@ -12,6 +12,7 @@ import ImageUpload from '../admin/ImageUpload';
 import SponsorsPanel from '../admin/SponsorsPanel';
 import AnnouncementsPanel from '../admin/AnnouncementsPanel';
 import CommunityPanel from '../admin/CommunityPanel';
+import ThemeSwitch from '../components/ThemeSwitch';
 
 /* ─── Small helpers ─── */
 function genId() { return Math.random().toString(36).slice(2, 9); }
@@ -756,7 +757,7 @@ function SettingsPage({ teams, toast }) {
 }
 
 /* ─── Main Admin Page ─── */
-export default function AdminPage({ toast }) {
+export default function AdminPage({ toast, theme, toggleTheme }) {
   const { user, logout } = useAuth();
   const { teams, loading } = useTeams();
   const navigate = useNavigate();
@@ -830,6 +831,10 @@ export default function AdminPage({ toast }) {
             </button>
           ))}
           <div className="admin-nav-section" style={{ marginTop: '1rem' }}>Account</div>
+          <div className="theme-switch-row" style={{ padding: '0.5rem 1.75rem' }}>
+            <span>Dark mode</span>
+            <ThemeSwitch theme={theme} onToggle={toggleTheme} variant="switch" />
+          </div>
           <a className="admin-nav-item" href="/" target="_blank" rel="noreferrer">
             <span>↗</span> View Site
           </a>
