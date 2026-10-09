@@ -1,6 +1,5 @@
 import Nav from '../components/Nav';
 import Hero from '../components/Hero';
-import VideoBanner from '../components/VideoBanner';
 import Announcements from '../components/Announcements';
 import Teams from '../components/Teams';
 import Tryouts from '../components/Tryouts';
@@ -18,7 +17,6 @@ export default function Home({ theme, toggleTheme }) {
     <>
       <Nav theme={theme} toggleTheme={toggleTheme} />
       <Hero />
-      <VideoBanner />
       <Announcements />
       <Teams teams={teams} loading={loading} />
       <Tryouts />
