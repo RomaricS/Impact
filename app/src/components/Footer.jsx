@@ -15,7 +15,7 @@ export default function Footer() {
       <div className="container">
         <div className="foot-top">
           <div className="foot-brand">
-            <img src="/logo.png" alt={content.footer.logo} className="foot-logo-img" />
+            <img src="/logo-wide.png" alt={content.footer.logo} className="foot-logo-img" />
             <p>{content.footer.tagline}</p>
             <p>{content.footer.address}</p>
             <div className="socials">

@@ -13,9 +13,9 @@ export default function Nav({ toggleTheme, theme }) {
   }
 
   return (
-    <nav>
+    <nav className="site-nav" aria-label="Main">
       <a className="nav-logo" href="/" aria-label={`${content.nav.logo}, home`}>
-        <img src="/logo.png" alt={content.nav.logo} className="nav-logo-img" />
+        <img src="/logo-wide.png" alt={content.nav.logo} className="nav-logo-img" />
       </a>
 
       <ul className="nav-links">

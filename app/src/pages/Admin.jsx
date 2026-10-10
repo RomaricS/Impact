@@ -192,7 +192,7 @@ export default function AdminPage({ toast, theme, toggleTheme }) {
     <div className="ad-layout">
       <aside className="ad-side">
         <div className="ad-brand">
-          <img src="/logo.png" alt="Impact Legends" className="ad-logo" />
+          <img src="/logo-wide.png" alt="Impact Legends" className="ad-logo" />
           <span className="ad-brand-tag">Admin</span>
         </div>
         <nav className="ad-nav" aria-label="Admin">

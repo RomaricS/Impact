@@ -28,7 +28,7 @@ export default function LoginPage({ theme, toggleTheme }) {
   return (
     <div className="login-page">
       <div className="login-form-side">
-        <img src="/logo.png" alt="Impact Legends Volleyball" className="login-logo" />
+        <img src="/logo-wide.png" alt="Impact Legends Volleyball" className="login-logo" />
         <div>
           <h1 className="login-title">Admin sign in</h1>
           <p className="login-sub">Manage teams, sponsors, announcements and site settings.</p>

@@ -76,7 +76,7 @@ body {
   transition: background-color 0.35s ease, color 0.35s ease;
 }
 /* NAV */
-nav {
+.site-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 800;
@@ -916,7 +916,7 @@ footer {
 
 /* TEAM PAGE */
 .team-card { text-decoration: none; }
-.tp-hero { background: var(--sky); color: var(--on-accent); position: relative; overflow: hidden; }
+.tp-hero { background: var(--sky); color: var(--on-accent); position: relative; overflow: hidden; padding-top: 77px; }
 .tp-hero-inner { max-width: 1240px; margin: 0 auto; padding: 28px 24px 0; position: relative; }
 .tp-crumb { font-size: 14px; font-weight: 500; }
 .tp-crumb a { color: var(--on-accent); }
@@ -1515,7 +1515,7 @@ footer {
 }
 @media (max-width: 640px) {
   .teams-grid { grid-template-columns: 1fr; }
-  nav { padding: 8px 1.25rem; }
+  .site-nav { padding: 8px 1.25rem; }
   .nav-logo-img { height: 48px; }
   .hero { padding: 80px 0; }
   .tp-sec { padding: 40px 16px 8px; }
