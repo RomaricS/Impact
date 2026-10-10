@@ -9,7 +9,7 @@ export default function Teams({ teams, loading }) {
   const sorted = sortTeams(teams);
 
   return (
-    <section className="sec" id="teams" style={{ background: 'var(--bg)' }} ref={ref}>
+    <section className="sec" id="teams" ref={ref}>
       <div className="container">
         <div className="sec-head rv">
           <div>

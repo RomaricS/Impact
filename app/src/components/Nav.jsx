@@ -2,7 +2,7 @@ import { useState } from 'react';
 import content from '../content.json';
 import ThemeSwitch from './ThemeSwitch';
 
-export default function Nav({ toggleTheme, theme, onTeamsClick, onTryoutsClick }) {
+export default function Nav({ toggleTheme, theme }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   function scrollTo(id) {

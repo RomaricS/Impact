@@ -34,24 +34,19 @@ export default function FileUpload({ value, onChange, path }) {
     }
   }
 
+  const ext = value ? (fileName(value).split('.').pop() || 'file').toUpperCase().slice(0, 4) : 'FILE';
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-      {value && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.6rem 0.85rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.8rem' }}>
-          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--muted)' }}>
-            📄 {fileName(value)}
-          </span>
-          <a href={value} target="_blank" rel="noreferrer" className="admin-btn admin-btn-ghost admin-btn-sm">View</a>
-          <button type="button" className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => onChange('')}>✕</button>
-        </div>
-      )}
-      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-        <input ref={inputRef} type="file" style={{ display: 'none' }} onChange={handleFile} />
-        <button type="button" className="admin-btn admin-btn-ghost admin-btn-sm"
-                onClick={() => inputRef.current?.click()} disabled={uploading}>
-          {uploading ? 'Uploading…' : value ? '↑ Replace File' : '↑ Attach File'}
-        </button>
-      </div>
+    <div className="file-upload">
+      <span className="ad-file-badge">{ext}</span>
+      <span className="ad-file-name">{value ? fileName(value) : 'No file attached'}</span>
+      <input ref={inputRef} type="file" hidden onChange={handleFile} />
+      {value && <a href={value} target="_blank" rel="noreferrer" className="ad-btn ad-btn-ghost ad-btn-sm">View</a>}
+      <button type="button" className="ad-btn ad-btn-outline ad-btn-sm"
+              onClick={() => inputRef.current?.click()} disabled={uploading}>
+        {uploading ? 'Uploading…' : value ? 'Replace' : 'Choose'}
+      </button>
+      {value && <button type="button" className="ad-icon-btn" aria-label="Remove file" onClick={() => onChange('')}>✕</button>}
     </div>
   );
 }

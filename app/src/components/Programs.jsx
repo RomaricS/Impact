@@ -4,7 +4,7 @@ import content from '../content.json';
 export default function Programs() {
   const ref = useReveal();
   return (
-    <section className="sec" id="programs" style={{ background: 'var(--bg)' }} ref={ref}>
+    <section className="sec" id="programs" ref={ref}>
       <div className="container">
         <div className="sec-head rv">
           <div>

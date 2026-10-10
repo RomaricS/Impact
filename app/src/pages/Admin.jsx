@@ -1,768 +1,151 @@
-import { useState, useRef, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { useTeams } from '../hooks/useTeams';
-import { usePayments } from '../hooks/usePayments';
-import { useSettings } from '../hooks/useSettings';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc, deleteDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../lib/firebase';
+import { db } from '../lib/firebase';
+import { useAuth } from '../hooks/useAuth';
+import { useTeams } from '../hooks/useTeams';
+import { useSponsors } from '../hooks/useSponsors';
+import { useAnnouncements } from '../hooks/useAnnouncements';
+import { useCommunity } from '../hooks/useCommunity';
 import { sortTeams, nextOrder } from '../lib/teamOrder';
-import ImageUpload from '../admin/ImageUpload';
 import SponsorsPanel from '../admin/SponsorsPanel';
 import AnnouncementsPanel from '../admin/AnnouncementsPanel';
 import CommunityPanel from '../admin/CommunityPanel';
+import SettingsPanel from '../admin/SettingsPanel';
+import TeamEditor from '../admin/TeamEditor';
+import { PageHead, Chip } from '../admin/ui';
 import ThemeSwitch from '../components/ThemeSwitch';
 
-/* ─── Small helpers ─── */
 function genId() { return Math.random().toString(36).slice(2, 9); }
 
-function EmptyItem({ label, onCreate }) {
+const ICONS = {
+  dashboard: 'M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z',
+  teams: 'M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM21 19v-1a4 4 0 0 0-3-3.9M15.5 3.2a3.5 3.5 0 0 1 0 6.6',
+  sponsors: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z',
+  announcements: 'M3 10v4h3l6 4V6L6 10H3zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',
+  community: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
+  settings: 'M4 7h10M18 7h2M4 17h2M10 17h10M16 5v4M8 15v4',
+};
+
+function useCountUp(target) {
+  const [k, setK] = useState(() =>
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 1 : 0);
+  useEffect(() => {
+    if (k === 1) return;
+    let raf, start = null;
+    const step = ts => {
+      if (start === null) start = ts;
+      const t = Math.min(1, (ts - start) / 1100);
+      setK(1 - Math.pow(1 - t, 3));
+      if (t < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return Math.round(target * k);
+}
+
+function StatTile({ label, value, sub, tone }) {
+  const shown = useCountUp(value);
   return (
-    <div className="admin-empty">
-      No {label} yet. <button className="admin-btn admin-btn-ghost admin-btn-sm" style={{ marginLeft: '0.5rem' }} onClick={onCreate}>+ Add first</button>
+    <div className={`ad-tile ad-tile-${tone}`}>
+      <div className="ad-tile-label">{label}</div>
+      <div className="ad-tile-value">{shown}</div>
+      <div className="ad-tile-sub">{sub}</div>
     </div>
   );
 }
 
-/* ─── Player editor ─── */
-const POSITIONS = ['OPP', 'S', 'MB', 'DS', 'L', 'OH'];
-
-function RosterEditor({ team, onSave }) {
-  const [roster, setRoster] = useState(team.roster || []);
-  const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ name: '', num: '', pos: '', photo: '' });
-
-  function openAdd() { setForm({ name: '', num: '', pos: '', pos2: '', photo: '', gradYear: '', school: '' }); setEditing('new'); }
-  function openEdit(i) { setForm({ ...roster[i] }); setEditing(i); }
-
-  function save() {
-    const item = { ...form, num: Number(form.num) || 0 };
-    const next = editing === 'new' ? [...roster, item] : roster.map((r, i) => i === editing ? item : r);
-    setRoster(next);
-    onSave(next);
-    setEditing(null);
-  }
-
-  function remove(i) {
-    const next = roster.filter((_, idx) => idx !== i);
-    setRoster(next);
-    onSave(next);
-  }
-
+function TeamGrid({ teams, onOpen }) {
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>{roster.length} players</span>
-        <button className="admin-btn admin-btn-primary admin-btn-sm" onClick={openAdd}>+ Add Player</button>
-      </div>
-
-      {editing !== null && (
-        <div className="admin-card" style={{ marginBottom: '1rem', borderColor: 'rgba(255,31,109,0.25)' }}>
-          <div className="admin-card-title">{editing === 'new' ? 'New Player' : 'Edit Player'}</div>
-          <div className="admin-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Name</label>
-                <input className="form-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Jersey #</label>
-                <input className="form-input" type="number" value={form.num} onChange={e => setForm(f => ({ ...f, num: e.target.value }))} />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Position 1</label>
-                <select className="form-select" value={form.pos} onChange={e => setForm(f => ({ ...f, pos: e.target.value }))}>
-                  <option value="">Select position…</option>
-                  {POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Position 2 (optional)</label>
-                <select className="form-select" value={form.pos2 || ''} onChange={e => setForm(f => ({ ...f, pos2: e.target.value }))}>
-                  <option value="">None</option>
-                  {POSITIONS.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Player Photo</label>
-              <ImageUpload
-                value={form.photo}
-                onChange={url => setForm(f => ({ ...f, photo: url }))}
-                path={`players/${form.name.replace(/\s+/g,'-').toLowerCase() || 'player'}`}
-                portrait
-              />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Grad Year</label>
-                <input className="form-input" value={form.gradYear} placeholder="e.g. 2027" onChange={e => setForm(f => ({ ...f, gradYear: e.target.value }))} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">School</label>
-                <input className="form-input" value={form.school} placeholder="e.g. Canterbury HS" onChange={e => setForm(f => ({ ...f, school: e.target.value }))} />
-              </div>
-            </div>
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-primary" onClick={save}>Save Player</button>
-              <button className="admin-btn admin-btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {roster.length === 0 && editing === null && <EmptyItem label="players" onCreate={openAdd} />}
-      <div className="admin-list">
-        {roster.map((p, i) => (
-          <div key={i} className="admin-list-item">
-            <div className="admin-list-item-info">
-              <strong>#{p.num || '—'} {p.name}</strong>
-              <span>{[p.pos, p.school, p.gradYear ? `'${String(p.gradYear).slice(-2)}` : ''].filter(Boolean).join(' · ') || 'No details'}</span>
-            </div>
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={() => openEdit(i)}>Edit</button>
-              <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => remove(i)}>✕</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ─── Tournament editor ─── */
-function TournamentEditor({ team, onSave }) {
-  const [list, setList] = useState(team.tournaments || []);
-  const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ name: '', date: '', endDate: '', location: '', address: '', result: '' });
-
-  function openAdd() { setForm({ name: '', date: '', endDate: '', location: '', address: '', result: '' }); setEditing('new'); }
-  function openEdit(i) { setForm({ ...list[i] }); setEditing(i); }
-
-  function save() {
-    const next = editing === 'new' ? [...list, { ...form }] : list.map((t, i) => i === editing ? { ...form } : t);
-    const sorted = [...next].sort((a, b) => a.date.localeCompare(b.date));
-    setList(sorted);
-    onSave(sorted);
-    setEditing(null);
-  }
-
-  function remove(i) {
-    const next = list.filter((_, idx) => idx !== i);
-    setList(next);
-    onSave(next);
-  }
-
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>{list.length} tournaments</span>
-        <button className="admin-btn admin-btn-primary admin-btn-sm" onClick={openAdd}>+ Add Tournament</button>
-      </div>
-
-      {editing !== null && (
-        <div className="admin-card" style={{ marginBottom: '1rem', borderColor: 'rgba(255,31,109,0.25)' }}>
-          <div className="admin-card-title">{editing === 'new' ? 'New Tournament' : 'Edit Tournament'}</div>
-          <div className="admin-form">
-            <div className="form-group">
-              <label className="form-label">Tournament Name</label>
-              <input className="form-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Start Date</label>
-                <input className="form-input" type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">End Date</label>
-                <input className="form-input" type="date" value={form.endDate} onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Venue / Organizer</label>
-                <input className="form-input" value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">City, State</label>
-                <input className="form-input" value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Result (leave blank if upcoming)</label>
-              <input className="form-input" value={form.result} placeholder="e.g. 1st of 24 teams" onChange={e => setForm(f => ({ ...f, result: e.target.value }))} />
-            </div>
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-primary" onClick={save}>Save Tournament</button>
-              <button className="admin-btn admin-btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {list.length === 0 && editing === null && <EmptyItem label="tournaments" onCreate={openAdd} />}
-      <div className="admin-list">
-        {list.map((t, i) => (
-          <div key={i} className="admin-list-item">
-            <div className="admin-list-item-info">
-              <strong>{t.name}</strong>
-              <span>{t.date}{t.endDate !== t.date ? ` – ${t.endDate}` : ''} · {t.address} {t.result ? `· ${t.result}` : ''}</span>
-            </div>
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={() => openEdit(i)}>Edit</button>
-              <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => remove(i)}>✕</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ─── Practice editor ─── */
-function PracticeEditor({ team, onSave }) {
-  const [list, setList] = useState(team.practices || []);
-  const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ day: 'Monday', time: '', location: '', address: '', type: '' });
-  const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-
-  function openAdd() { setForm({ day: 'Monday', time: '', location: '', address: '', type: '' }); setEditing('new'); }
-  function openEdit(i) { setForm({ ...list[i] }); setEditing(i); }
-
-  function save() {
-    const next = editing === 'new' ? [...list, { ...form }] : list.map((p, i) => i === editing ? { ...form } : p);
-    setList(next);
-    onSave(next);
-    setEditing(null);
-  }
-
-  function remove(i) {
-    const next = list.filter((_, idx) => idx !== i);
-    setList(next);
-    onSave(next);
-  }
-
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>{list.length} sessions</span>
-        <button className="admin-btn admin-btn-primary admin-btn-sm" onClick={openAdd}>+ Add Practice</button>
-      </div>
-
-      {editing !== null && (
-        <div className="admin-card" style={{ marginBottom: '1rem', borderColor: 'rgba(255,31,109,0.25)' }}>
-          <div className="admin-card-title">{editing === 'new' ? 'New Practice' : 'Edit Practice'}</div>
-          <div className="admin-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Day</label>
-                <select className="form-select" value={form.day} onChange={e => setForm(f => ({ ...f, day: e.target.value }))}>
-                  {DAYS.map(d => <option key={d}>{d}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Time</label>
-                <input className="form-input" value={form.time} placeholder="6:00 – 8:00 PM" onChange={e => setForm(f => ({ ...f, time: e.target.value }))} />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Location Name</label>
-                <input className="form-input" value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Address</label>
-                <input className="form-input" value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Session Type</label>
-              <input className="form-input" value={form.type} placeholder="e.g. Full Team, Position Training" onChange={e => setForm(f => ({ ...f, type: e.target.value }))} />
-            </div>
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-primary" onClick={save}>Save Practice</button>
-              <button className="admin-btn admin-btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {list.length === 0 && editing === null && <EmptyItem label="practices" onCreate={openAdd} />}
-      <div className="admin-list">
-        {list.map((p, i) => (
-          <div key={i} className="admin-list-item">
-            <div className="admin-list-item-info">
-              <strong>{p.day} · {p.time}</strong>
-              <span>{p.location}{p.type ? ` · ${p.type}` : ''}</span>
-            </div>
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={() => openEdit(i)}>Edit</button>
-              <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => remove(i)}>✕</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ─── Coach editor ─── */
-function CoachEditor({ team, onSave }) {
-  const [list, setList] = useState(team.coaches || []);
-  const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ name: '', title: '', bio: '', photo: '' });
-
-  function openAdd() { setForm({ name: '', title: 'Head Coach', bio: '', photo: '' }); setEditing('new'); }
-  function openEdit(i) { setForm({ ...list[i] }); setEditing(i); }
-
-  function save() {
-    const next = editing === 'new' ? [...list, { ...form }] : list.map((c, i) => i === editing ? { ...form } : c);
-    setList(next);
-    onSave(next);
-    setEditing(null);
-  }
-
-  function remove(i) {
-    const next = list.filter((_, idx) => idx !== i);
-    setList(next);
-    onSave(next);
-  }
-
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>{list.length} coaches</span>
-        <button className="admin-btn admin-btn-primary admin-btn-sm" onClick={openAdd}>+ Add Coach</button>
-      </div>
-
-      {editing !== null && (
-        <div className="admin-card" style={{ marginBottom: '1rem', borderColor: 'rgba(255,31,109,0.25)' }}>
-          <div className="admin-card-title">{editing === 'new' ? 'New Coach' : 'Edit Coach'}</div>
-          <div className="admin-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Name</label>
-                <input className="form-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Title</label>
-                <select className="form-select" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}>
-                  <option>Head Coach</option>
-                  <option>Assistant Coach</option>
-                  <option>Volunteer Coach</option>
-                </select>
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Bio</label>
-              <textarea className="form-textarea" value={form.bio} onChange={e => setForm(f => ({ ...f, bio: e.target.value }))} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Coach Photo</label>
-              <ImageUpload
-                value={form.photo}
-                onChange={url => setForm(f => ({ ...f, photo: url }))}
-                path={`coaches/${form.name.replace(/\s+/g,'-').toLowerCase() || 'coach'}`}
-              />
-            </div>
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-primary" onClick={save}>Save Coach</button>
-              <button className="admin-btn admin-btn-ghost" onClick={() => setEditing(null)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {list.length === 0 && editing === null && <EmptyItem label="coaches" onCreate={openAdd} />}
-      <div className="admin-list">
-        {list.map((c, i) => (
-          <div key={i} className="admin-list-item">
-            <div className="admin-list-item-info">
-              <strong>{c.name}</strong>
-              <span>{c.title}</span>
-            </div>
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={() => openEdit(i)}>Edit</button>
-              <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => remove(i)}>✕</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ─── Team details editor ─── */
-function DetailsEditor({ team, onSave, onDelete }) {
-  const [form, setForm] = useState({
-    name: team.name || '',
-    sub: team.sub || '',
-    division: team.division || '',
-    color: team.color || 'blue',
-    order: team.order ?? '',
-  });
-  const [saving, setSaving] = useState(false);
-
-  async function save() {
-    if (!form.name.trim()) return;
-    setSaving(true);
-    await onSave({
-      name: form.name.trim(),
-      sub: form.sub.trim(),
-      division: form.division.trim(),
-      color: form.color,
-      order: Number(form.order) || 0,
-    });
-    setSaving(false);
-  }
-
-  return (
-    <div className="admin-form">
-      <div className="form-row">
-        <div className="form-group">
-          <label className="form-label">Team Title / Name</label>
-          <input className="form-input" value={form.name} placeholder="e.g. 12 Blue"
-                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-        </div>
-        <div className="form-group">
-          <label className="form-label">Subtitle</label>
-          <input className="form-input" value={form.sub} placeholder="e.g. Ages 12 & Under"
-                 onChange={e => setForm(f => ({ ...f, sub: e.target.value }))} />
-        </div>
-      </div>
-      <div className="form-row">
-        <div className="form-group">
-          <label className="form-label">Division (pill label)</label>
-          <input className="form-input" value={form.division} placeholder="e.g. Blue"
-                 onChange={e => setForm(f => ({ ...f, division: e.target.value }))} />
-        </div>
-        <div className="form-group">
-          <label className="form-label">Color</label>
-          <select className="form-select" value={form.color}
-                  onChange={e => setForm(f => ({ ...f, color: e.target.value }))}>
-            <option value="blue">Blue</option>
-            <option value="pink">Pink</option>
-          </select>
-        </div>
-      </div>
-      <div className="form-group">
-        <label className="form-label">Sort Order (lower shows first)</label>
-        <input className="form-input" type="number" value={form.order} placeholder="e.g. 1"
-               onChange={e => setForm(f => ({ ...f, order: e.target.value }))} />
-      </div>
-      <div className="admin-actions">
-        <button className="admin-btn admin-btn-primary" onClick={save} disabled={saving || !form.name.trim()}>
-          {saving ? 'Saving…' : 'Save Details'}
+    <div className="ad-team-grid">
+      {teams.map(t => (
+        <button key={t.id} type="button" className={`ad-team-card ${t.color === 'pink' ? 'is-pink' : 'is-blue'}`} onClick={() => onOpen(t.id)}>
+          <span className="ad-team-num">{t.name.split(' ')[0]}</span>
+          <span className="ad-team-name">{t.name}</span>
+          <span className="ad-team-meta">{t.sub} · {t.roster?.length || 0} players</span>
         </button>
-      </div>
-
-      <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
-        <div className="admin-card-title" style={{ color: 'var(--pink)' }}>Danger Zone</div>
-        <p style={{ fontSize: '0.85rem', color: 'var(--muted)', margin: '0.5rem 0 1rem', lineHeight: 1.7 }}>
-          Permanently delete this team and all of its roster, schedule, practices, and coaches.
-          This cannot be undone.
-        </p>
-        <button className="admin-btn admin-btn-danger" onClick={onDelete}>Delete Team</button>
-      </div>
+      ))}
     </div>
   );
 }
 
-/* ─── Team editor page ─── */
-function TeamEditorPage({ team, onBack, onDelete, toast }) {
-  const [tab, setTab] = useState('details');
-
-  async function saveField(field, value) {
-    try {
-      await setDoc(doc(db, 'teams', team.id), { [field]: value }, { merge: true });
-      toast('Saved ✓');
-    } catch {
-      toast('Save failed', 'error');
-    }
-  }
-
-  async function saveFields(fields) {
-    try {
-      await setDoc(doc(db, 'teams', team.id), fields, { merge: true });
-      toast('Saved ✓');
-    } catch {
-      toast('Save failed', 'error');
-    }
-  }
-
-  const tabs = ['details', 'roster', 'tournaments', 'practices', 'coaches'];
+function Dashboard({ teams, loading, onOpenTeam, goTeams }) {
+  const players = teams.reduce((s, t) => s + (t.roster?.length || 0), 0);
+  const tournaments = teams.reduce((s, t) => s + (t.tournaments?.length || 0), 0);
+  const blue = teams.filter(t => t.color !== 'pink').length;
+  const empty = teams.filter(t => !t.roster?.length);
 
   return (
-    <div>
-      <button className="admin-back" onClick={onBack}>← All Teams</button>
-      <div className="admin-page-title">{team.name}</div>
-      <div className="admin-page-sub">{team.sub} · {team.roster?.length || 0} players</div>
-
-      <div className="admin-section-tabs">
-        {tabs.map(t => (
-          <button key={t} className={`admin-tab ${tab === t ? 'active' : ''}`}
-                  onClick={() => setTab(t)}>
-            {t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      <div className="admin-card">
-        {tab === 'details'     && <DetailsEditor     team={team} onSave={saveFields} onDelete={onDelete} />}
-        {tab === 'roster'      && <RosterEditor      team={team} onSave={v => saveField('roster', v)} />}
-        {tab === 'tournaments' && <TournamentEditor  team={team} onSave={v => saveField('tournaments', v)} />}
-        {tab === 'practices'   && <PracticeEditor    team={team} onSave={v => saveField('practices', v)} />}
-        {tab === 'coaches'     && <CoachEditor       team={team} onSave={v => saveField('coaches', v)} />}
-      </div>
-    </div>
-  );
-}
-
-/* ─── Settings page ─── */
-function SettingsPage({ teams, toast }) {
-  const importRef = useRef(null);
-  const pdfRef = useRef(null);
-  const [importing, setImporting] = useState(false);
-  const { qrs, pdfUrl } = usePayments();
-  const [qrDraft, setQrDraft] = useState(null);
-  const [savingQr, setSavingQr] = useState(false);
-  const [uploadingPdf, setUploadingPdf] = useState(false);
-  const [currentPdf, setCurrentPdf] = useState('');
-  useEffect(() => { setCurrentPdf(pdfUrl); }, [pdfUrl]);
-  const { settings } = useSettings();
-  const [regLink, setRegLink] = useState('');
-  const [savingReg, setSavingReg] = useState(false);
-  useEffect(() => { setRegLink(settings.registrationLink); }, [settings.registrationLink]);
-
-  async function saveRegLink() {
-    setSavingReg(true);
-    try {
-      await setDoc(doc(db, 'settings', 'main'), { registrationLink: regLink }, { merge: true });
-      toast('Registration link saved ✓');
-    } catch {
-      toast('Save failed', 'error');
-    } finally {
-      setSavingReg(false);
-    }
-  }
-
-  // Initialize draft from live data when first opened
-  function openQrEditor() {
-    setQrDraft(qrs.map(q => ({ ...q })));
-  }
-
-  function updateQrField(i, field, value) {
-    setQrDraft(d => d.map((q, idx) => idx === i ? { ...q, [field]: value } : q));
-  }
-
-  async function saveQrs() {
-    setSavingQr(true);
-    try {
-      await setDoc(doc(db, 'settings', 'payments'), { qr: qrDraft });
-      toast('Payment QR codes saved ✓');
-      setQrDraft(null);
-    } catch (err) {
-      console.error(err);
-      toast('Save failed', 'error');
-    } finally {
-      setSavingQr(false);
-    }
-  }
-
-  async function handlePdfUpload(e) {
-    const file = e.target.files?.[0];
-    if (!file || file.type !== 'application/pdf') { toast('Please select a PDF file', 'error'); return; }
-    setUploadingPdf(true);
-    try {
-      const storageRef = ref(storage, `fee-schedule-${Date.now()}.pdf`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      await setDoc(doc(db, 'settings', 'payments'), { feeSchedulePdf: url }, { merge: true });
-      setCurrentPdf(url);
-      toast('Fee schedule PDF updated ✓');
-    } catch (err) {
-      console.error(err);
-      toast('Upload failed', 'error');
-    } finally {
-      setUploadingPdf(false);
-      e.target.value = '';
-    }
-  }
-
-  async function clearPdf() {
-    await setDoc(doc(db, 'settings', 'payments'), { feeSchedulePdf: '' }, { merge: true });
-    setCurrentPdf('');
-    toast('PDF removed ✓');
-  }
-
-  function handleExport() {
-    const clean = {};
-    Object.entries(teams).forEach(([id, t]) => {
-      const { id: _id, ...rest } = t;
-      clean[id] = rest;
-    });
-    const blob = new Blob([JSON.stringify(clean, null, 2)], { type: 'application/json' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `impact-teams-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast('Exported ✓');
-  }
-
-  async function handleImport(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImporting(true);
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      await Promise.all(
-        Object.entries(data).map(([id, team]) =>
-          setDoc(doc(db, 'teams', id), team)
-        )
-      );
-      toast('Imported successfully ✓');
-    } catch (err) {
-      console.error(err);
-      toast('Import failed — check JSON format', 'error');
-    } finally {
-      setImporting(false);
-      e.target.value = '';
-    }
-  }
-
-  return (
-    <div>
-      <div className="admin-page-title">Settings</div>
-      <div className="admin-page-sub">Site configuration and data management.</div>
-
-      <div className="admin-card">
-        <div className="admin-card-title">Tryout Registration Link</div>
-        <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '1.25rem', lineHeight: 1.7 }}>
-          The URL the "Register Now" button in the Tryouts section points to.
-        </p>
-        <div className="admin-form">
-          <div className="form-group">
-            <label className="form-label">Registration URL</label>
-            <input className="form-input" value={regLink}
-                   onChange={e => setRegLink(e.target.value)}
-                   placeholder="https://forms.gle/…" />
+    <div className="ad-screen">
+      <PageHead title="Dashboard" sub="Welcome back. Manage your club content below." />
+      {!loading && (
+        <div className="ad-tiles">
+          <StatTile label="Teams" value={teams.length} sub={`${blue} Blue · ${teams.length - blue} Pink`} tone="blue" />
+          <StatTile label="Players" value={players} sub="Across all rosters" tone="pink" />
+          <StatTile label="Tournaments" value={tournaments} sub="Across all team schedules" tone="chip" />
+        </div>
+      )}
+      {!loading && empty.length > 0 && (
+        <div className="ad-notice">
+          <div>
+            <strong>{empty.length} team{empty.length === 1 ? ' has an' : 's have'} empty roster{empty.length === 1 ? '' : 's'}</strong>
+            <span>{empty.map(t => t.name).join(', ')}</span>
           </div>
-          <div className="admin-actions">
-            <button className="admin-btn admin-btn-primary" onClick={saveRegLink} disabled={savingReg}>
-              {savingReg ? 'Saving…' : 'Save Link'}
+          <button type="button" className="ad-btn ad-btn-outline" onClick={goTeams}>Open teams</button>
+        </div>
+      )}
+      <h2 className="ad-h2">Quick access</h2>
+      {loading ? <div className="ad-empty">Loading…</div> : <TeamGrid teams={teams} onOpen={onOpenTeam} />}
+    </div>
+  );
+}
+
+function TeamsList({ teams, loading, onOpen, onAdd }) {
+  return (
+    <div className="ad-screen">
+      <PageHead title="Teams" sub="Select a team to manage it, or add a new one."
+                action={<button type="button" className="ad-btn ad-btn-primary" onClick={onAdd}>+ Add team</button>} />
+      {loading ? <div className="ad-empty">Loading…</div> : (
+        <div className="ad-table" role="table" aria-label="Teams">
+          <div className="ad-table-row ad-table-head" role="row">
+            <span role="columnheader">#</span><span role="columnheader">Team</span>
+            <span role="columnheader">Division</span><span role="columnheader">Players</span>
+            <span role="columnheader">Tournaments</span><span role="columnheader" />
+          </div>
+          {teams.map(t => (
+            <button key={t.id} type="button" className="ad-table-row" role="row" onClick={() => onOpen(t.id)}>
+              <span className="ad-mono" role="cell">{t.order ?? '—'}</span>
+              <span className="ad-table-team" role="cell">
+                <span className={`ad-team-num sm ${t.color === 'pink' ? 'is-pink' : 'is-blue'}`}>{t.name.split(' ')[0]}</span>
+                <span><strong>{t.name}</strong><span className="ad-hint">{t.sub}</span></span>
+              </span>
+              <span role="cell"><Chip tone={t.color === 'pink' ? 'pink' : 'blue'}>{t.division}</Chip></span>
+              <span role="cell">{t.roster?.length || 0}</span>
+              <span role="cell">{t.tournaments?.length || 0}</span>
+              <span className="ad-table-edit" role="cell">Edit →</span>
             </button>
-          </div>
+          ))}
         </div>
-      </div>
-
-      {/* ── QR Code Editor ── */}
-      <div className="admin-card">
-        <div className="admin-card-title">Payment QR Codes</div>
-        <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '1.25rem', lineHeight: 1.7 }}>
-          Update QR code images and account handles. Changes appear immediately on the public site.
-        </p>
-
-        {!qrDraft ? (
-          <button className="admin-btn admin-btn-primary" onClick={openQrEditor}>
-            Edit QR Codes
-          </button>
-        ) : (
-          <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
-              {qrDraft.map((q, i) => (
-                <div key={i} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{q.label}</div>
-                  <ImageUpload
-                    value={q.src}
-                    onChange={url => updateQrField(i, 'src', url)}
-                    path={`qr/${q.cls}-${i}`}
-                  />
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Handle</label>
-                    <input className="form-input" value={q.handle}
-                           onChange={e => updateQrField(i, 'handle', e.target.value)} />
-                  </div>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Note</label>
-                    <input className="form-input" value={q.note}
-                           onChange={e => updateQrField(i, 'note', e.target.value)} />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button className="admin-btn admin-btn-primary" onClick={saveQrs} disabled={savingQr}>
-                {savingQr ? 'Saving…' : 'Save QR Codes'}
-              </button>
-              <button className="admin-btn admin-btn-ghost" onClick={() => setQrDraft(null)}>
-                Cancel
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* ── Fee Schedule PDF ── */}
-      <div className="admin-card">
-        <div className="admin-card-title">Fee Schedule PDF</div>
-        <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '1.25rem', lineHeight: 1.7 }}>
-          Upload the fee schedule PDF. A download button will appear in the Fees section of the public site.
-        </p>
-        {currentPdf && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', padding: '0.75rem 1rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.83rem' }}>
-            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--muted)' }}>
-              📄 Fee schedule on file
-            </span>
-            <a href={currentPdf} target="_blank" rel="noreferrer" className="admin-btn admin-btn-ghost admin-btn-sm">View</a>
-            <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={clearPdf}>Remove</button>
-          </div>
-        )}
-        <input ref={pdfRef} type="file" accept=".pdf,application/pdf" style={{ display: 'none' }} onChange={handlePdfUpload} />
-        <button className="admin-btn admin-btn-primary" onClick={() => pdfRef.current?.click()} disabled={uploadingPdf}>
-          {uploadingPdf ? 'Uploading…' : currentPdf ? '↑ Replace PDF' : '↑ Upload PDF'}
-        </button>
-      </div>
-
-      <div className="admin-card">
-        <div className="admin-card-title">Export Data</div>
-        <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '1.25rem', lineHeight: 1.7 }}>
-          Download all current team data from Firestore as a JSON file — useful as a backup or to share for editing.
-        </p>
-        <button className="admin-btn admin-btn-primary" onClick={handleExport}>
-          ↓ Export teams.json
-        </button>
-      </div>
-
-      <div className="admin-card">
-        <div className="admin-card-title">Import Data</div>
-        <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '1.25rem', lineHeight: 1.7 }}>
-          Upload a previously exported JSON file to restore or update all team data.{' '}
-          <strong style={{ color: 'var(--fg)' }}>This overwrites existing data.</strong>
-        </p>
-        <input ref={importRef} type="file" accept=".json,application/json"
-               style={{ display: 'none' }} onChange={handleImport} />
-        <button className="admin-btn admin-btn-ghost" onClick={() => importRef.current?.click()} disabled={importing}>
-          {importing ? 'Importing…' : '↑ Import teams.json'}
-        </button>
-      </div>
-
+      )}
     </div>
   );
 }
 
-/* ─── Main Admin Page ─── */
 export default function AdminPage({ toast, theme, toggleTheme }) {
   const { user, logout } = useAuth();
   const { teams, loading } = useTeams();
+  const { sponsors } = useSponsors();
+  const { announcements } = useAnnouncements(100);
+  const { campaigns } = useCommunity();
   const navigate = useNavigate();
   const [view, setView] = useState('dashboard');
   const [selectedTeamId, setSelectedTeamId] = useState(null);
+
+  const sorted = sortTeams(teams);
+  const selectedTeam = selectedTeamId ? teams[selectedTeamId] : null;
+
   async function handleLogout() {
     await logout();
     navigate('/admin/login');
@@ -772,15 +155,8 @@ export default function AdminPage({ toast, theme, toggleTheme }) {
     const id = genId();
     try {
       await setDoc(doc(db, 'teams', id), {
-        name: 'New Team',
-        sub: '',
-        division: 'Blue',
-        color: 'blue',
-        order: nextOrder(teams),
-        roster: [],
-        coaches: [],
-        practices: [],
-        tournaments: [],
+        name: 'New Team', sub: '', division: 'Blue', color: 'blue',
+        order: nextOrder(teams), roster: [], coaches: [], practices: [], tournaments: [],
       });
       setSelectedTeamId(id);
       setView('teams');
@@ -791,7 +167,6 @@ export default function AdminPage({ toast, theme, toggleTheme }) {
   }
 
   async function handleDeleteTeam(team) {
-    if (!window.confirm(`Delete "${team.name}"? This permanently removes its roster, schedule, practices, and coaches. This cannot be undone.`)) return;
     try {
       await deleteDoc(doc(db, 'teams', team.id));
       setSelectedTeamId(null);
@@ -801,133 +176,67 @@ export default function AdminPage({ toast, theme, toggleTheme }) {
     }
   }
 
-  const sorted = sortTeams(teams);
-  const selectedTeam = selectedTeamId ? teams[selectedTeamId] : null;
+  function go(v) { setView(v); setSelectedTeamId(null); }
+  function openTeam(id) { setSelectedTeamId(id); setView('teams'); }
 
-  const navItems = [
-    { id: 'dashboard',     label: 'Dashboard',     icon: '⊞' },
-    { id: 'teams',         label: 'Teams',          icon: '🏐' },
-    { id: 'sponsors',      label: 'Sponsors',       icon: '🤝' },
-    { id: 'announcements', label: 'Announcements',  icon: '📢' },
-    { id: 'community',     label: 'Community',      icon: '🌱' },
-    { id: 'settings',      label: 'Settings',       icon: '⚙' },
+  const nav = [
+    { id: 'dashboard',     label: 'Dashboard' },
+    { id: 'teams',         label: 'Teams',         count: sorted.length },
+    { id: 'sponsors',      label: 'Sponsors',      count: sponsors.length },
+    { id: 'announcements', label: 'Announcements', count: announcements.length },
+    { id: 'community',     label: 'Community',     count: campaigns.length },
+    { id: 'settings',      label: 'Settings' },
   ];
 
   return (
-    <div className="admin-layout">
-      {/* Sidebar */}
-      <div className="admin-sidebar">
-        <div className="admin-sidebar-header">
-          <div className="logo">IMPACT <em>LEGENDS</em></div>
-          <p>Admin Dashboard</p>
+    <div className="ad-layout">
+      <aside className="ad-side">
+        <div className="ad-brand">
+          <img src="/logo.png" alt="Impact Legends" className="ad-logo" />
+          <span className="ad-brand-tag">Admin</span>
         </div>
-        <div className="admin-nav">
-          <div className="admin-nav-section">Navigation</div>
-          {navItems.map(n => (
-            <button key={n.id}
-                    className={`admin-nav-item ${view === n.id ? 'active' : ''}`}
-                    onClick={() => { setView(n.id); setSelectedTeamId(null); }}>
-              <span>{n.icon}</span> {n.label}
+        <nav className="ad-nav" aria-label="Admin">
+          {nav.map(n => (
+            <button key={n.id} type="button"
+                    className={`ad-nav-item ${view === n.id ? 'on' : ''}`}
+                    aria-current={view === n.id ? 'page' : undefined}
+                    onClick={() => go(n.id)}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d={ICONS[n.id]} />
+              </svg>
+              <span>{n.label}</span>
+              {n.count !== undefined && <span className="ad-nav-count">{n.count}</span>}
             </button>
           ))}
-          <div className="admin-nav-section" style={{ marginTop: '1rem' }}>Account</div>
-          <div className="theme-switch-row" style={{ padding: '0.5rem 1.75rem' }}>
+        </nav>
+        <div className="ad-side-foot">
+          <div className="theme-switch-row">
             <span>Dark mode</span>
             <ThemeSwitch theme={theme} onToggle={toggleTheme} variant="switch" />
           </div>
-          <a className="admin-nav-item" href="/" target="_blank" rel="noreferrer">
-            <span>↗</span> View Site
-          </a>
-          <button className="admin-nav-item" onClick={handleLogout}>
-            <span>⏻</span> Sign Out
-          </button>
+          <a className="ad-btn ad-btn-outline ad-btn-block" href="/" target="_blank" rel="noreferrer">View site ↗</a>
+          <button type="button" className="ad-signout" onClick={handleLogout}>Sign out</button>
+          <div className="ad-user">{user?.email}</div>
         </div>
-        <div style={{ padding: '1rem 1.75rem', fontSize: '0.7rem', color: 'var(--muted)', borderTop: '1px solid var(--border)' }}>
-          {user?.email}
+      </aside>
+
+      <main className="ad-main">
+        <div className="ad-fade" key={selectedTeam ? `team-${selectedTeamId}` : view}>
+          {selectedTeam ? (
+            <TeamEditor team={selectedTeam} onBack={() => setSelectedTeamId(null)}
+                        onDelete={() => handleDeleteTeam(selectedTeam)} toast={toast} />
+          ) : (
+            <>
+              {view === 'dashboard' && <Dashboard teams={sorted} loading={loading} onOpenTeam={openTeam} goTeams={() => go('teams')} />}
+              {view === 'teams' && <TeamsList teams={sorted} loading={loading} onOpen={openTeam} onAdd={handleAddTeam} />}
+              {view === 'sponsors' && <SponsorsPanel toast={toast} />}
+              {view === 'announcements' && <AnnouncementsPanel toast={toast} />}
+              {view === 'community' && <CommunityPanel toast={toast} />}
+              {view === 'settings' && <SettingsPanel teams={teams} toast={toast} />}
+            </>
+          )}
         </div>
-      </div>
-
-      {/* Main content */}
-      <div className="admin-main">
-        {/* Dashboard */}
-        {view === 'dashboard' && !selectedTeam && (
-          <div>
-            <div className="admin-page-title">Dashboard</div>
-            <div className="admin-page-sub">Welcome back — manage your club content below.</div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px,1fr))', gap: '1rem', marginBottom: '2rem' }}>
-              {[
-                { label: 'Teams',       value: sorted.length },
-                { label: 'Total Players', value: sorted.reduce((s, t) => s + (t.roster?.length || 0), 0) },
-                { label: 'Tournaments', value: sorted.reduce((s, t) => s + (t.tournaments?.length || 0), 0) },
-              ].map(s => (
-                <div key={s.label} className="admin-card" style={{ textAlign: 'center' }}>
-                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '3rem', color: 'var(--pink)', lineHeight: 1 }}>{s.value}</div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.3rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="admin-card">
-              <div className="admin-card-title">Quick Access — Teams</div>
-              {loading ? <div className="admin-empty">Loading…</div> : (
-                <div className="admin-grid">
-                  {sorted.map(t => (
-                    <button key={t.id} className="admin-team-btn"
-                            onClick={() => { setSelectedTeamId(t.id); setView('teams'); }}>
-                      <div className="tnum">{t.name.split(' ')[0]}</div>
-                      <div className="tname">{t.name}</div>
-                      <div className="tsub">{t.roster?.length || 0} players · {t.tournaments?.length || 0} events</div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Teams list */}
-        {view === 'teams' && !selectedTeam && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
-              <div>
-                <div className="admin-page-title">Teams</div>
-                <div className="admin-page-sub">Select a team to manage it, or add a new one.</div>
-              </div>
-              <button className="admin-btn admin-btn-primary" onClick={handleAddTeam}>+ Add Team</button>
-            </div>
-            {loading ? <div className="admin-empty">Loading…</div> : (
-              <div className="admin-grid">
-                {sorted.map(t => (
-                  <button key={t.id} className="admin-team-btn" onClick={() => setSelectedTeamId(t.id)}>
-                    <div className="tnum">{t.name.split(' ')[0]}</div>
-                    <div className="tname">{t.name}</div>
-                    <div className="tsub">{t.roster?.length || 0} players · {t.tournaments?.length || 0} events</div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Team editor */}
-        {selectedTeam && (
-          <TeamEditorPage
-            team={selectedTeam}
-            onBack={() => setSelectedTeamId(null)}
-            onDelete={() => handleDeleteTeam(selectedTeam)}
-            toast={toast}
-          />
-        )}
-
-        {/* Settings */}
-        {view === 'settings' && (
-          <SettingsPage teams={teams} toast={toast} />
-        )}
-        {view === 'sponsors'      && <SponsorsPanel      toast={toast} />}
-        {view === 'announcements' && <AnnouncementsPanel toast={toast} />}
-        {view === 'community'     && <CommunityPanel    toast={toast} />}
-      </div>
+      </main>
     </div>
   );
 }

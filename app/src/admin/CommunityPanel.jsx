@@ -4,6 +4,7 @@ import { db } from '../lib/firebase';
 import { useCommunity } from '../hooks/useCommunity';
 import ImageUpload from './ImageUpload';
 import FileUpload from './FileUpload';
+import { SplitLayout, ListRow, EditorPanel, ConfirmDelete, Field, PageHead, EmptyState } from './ui';
 
 const EMPTY_FORM = {
   headline: '', description: '', steps: [''],
@@ -15,48 +16,37 @@ const EMPTY_FORM = {
 
 export default function CommunityPanel({ toast }) {
   const { campaigns } = useCommunity();
-  const [mode, setMode] = useState('list'); // 'list' | 'add' | 'edit'
+  const [sel, setSel] = useState(null); // id | 'new' | null
   const [form, setForm] = useState(EMPTY_FORM);
-  const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
 
   function openAdd() {
     setForm({ ...EMPTY_FORM, order: campaigns.length });
-    setEditingId(null);
-    setMode('add');
+    setSel('new');
   }
 
   function openEdit(c) {
     const { id, ...rest } = c;
     setForm({ ...EMPTY_FORM, ...rest, steps: rest.steps?.length ? rest.steps : [''] });
-    setEditingId(id);
-    setMode('edit');
+    setSel(id);
   }
 
-  function updateStep(i, value) {
-    setForm(f => ({ ...f, steps: f.steps.map((s, idx) => idx === i ? value : s) }));
-  }
-
-  function addStep() {
-    setForm(f => ({ ...f, steps: [...f.steps, ''] }));
-  }
-
-  function removeStep(i) {
-    setForm(f => ({ ...f, steps: f.steps.filter((_, idx) => idx !== i) }));
-  }
+  const updateStep = (i, value) => setForm(f => ({ ...f, steps: f.steps.map((s, idx) => idx === i ? value : s) }));
+  const addStep = () => setForm(f => ({ ...f, steps: [...f.steps, ''] }));
+  const removeStep = i => setForm(f => ({ ...f, steps: f.steps.filter((_, idx) => idx !== i) }));
 
   async function save() {
     if (!form.headline.trim()) { toast('Headline is required', 'error'); return; }
     setSaving(true);
     try {
       const payload = { ...form, steps: form.steps.filter(s => s.trim()) };
-      if (mode === 'edit' && editingId) {
-        await setDoc(doc(db, 'community', editingId), payload);
+      if (sel !== 'new') {
+        await setDoc(doc(db, 'community', sel), payload);
       } else {
-        await addDoc(collection(db, 'community'), payload);
+        const r = await addDoc(collection(db, 'community'), payload);
+        setSel(r.id);
       }
       toast('Saved ✓');
-      setMode('list');
     } catch (err) {
       console.error(err);
       toast('Save failed', 'error');
@@ -66,177 +56,102 @@ export default function CommunityPanel({ toast }) {
   }
 
   async function remove(id) {
-    if (!window.confirm('Delete this campaign?')) return;
     try {
       await deleteDoc(doc(db, 'community', id));
+      setSel(null);
       toast('Deleted ✓');
     } catch {
       toast('Delete failed', 'error');
     }
   }
 
-  async function moveUp(campaign) {
+  async function swap(campaign, dir) {
     const sorted = [...campaigns].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     const idx = sorted.findIndex(c => c.id === campaign.id);
-    if (idx <= 0) return;
-    const other = sorted[idx - 1];
+    const other = sorted[idx + dir];
+    if (!other) return;
     const { id: id1, ...r1 } = campaign;
     const { id: id2, ...r2 } = other;
     await Promise.all([
       setDoc(doc(db, 'community', id1), { ...r1, order: other.order ?? 0 }),
       setDoc(doc(db, 'community', id2), { ...r2, order: campaign.order ?? 0 }),
     ]);
+    toast('Order saved ✓');
   }
 
-  async function moveDown(campaign) {
-    const sorted = [...campaigns].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-    const idx = sorted.findIndex(c => c.id === campaign.id);
-    if (idx >= sorted.length - 1) return;
-    const other = sorted[idx + 1];
-    const { id: id1, ...r1 } = campaign;
-    const { id: id2, ...r2 } = other;
-    await Promise.all([
-      setDoc(doc(db, 'community', id1), { ...r1, order: other.order ?? 0 }),
-      setDoc(doc(db, 'community', id2), { ...r2, order: campaign.order ?? 0 }),
-    ]);
-  }
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const isNew = sel === 'new';
 
-  /* ── Add / Edit form ── */
-  if (mode === 'add' || mode === 'edit') {
-    return (
-      <div>
-        <button className="admin-back" onClick={() => setMode('list')}>← Community</button>
-        <div className="admin-page-title">{mode === 'add' ? 'New Campaign' : 'Edit Campaign'}</div>
-        <div className="admin-card">
-          <div className="admin-form">
-
-            <div className="form-group">
-              <label className="form-label">Headline</label>
-              <input className="form-input" value={form.headline}
-                     onChange={e => setForm(f => ({ ...f, headline: e.target.value }))}
-                     placeholder="Support the Next Generation." />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Description</label>
-              <textarea className="form-textarea" rows={3} value={form.description}
-                        onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                        placeholder="Every purchase you make can fund scholarships for our athletes — at zero extra cost to you." />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Steps</label>
-              {form.steps.map((step, i) => (
-                <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--pink)', fontWeight: 700, minWidth: 20 }}>{i + 1}.</span>
-                  <input className="form-input" style={{ flex: 1, marginBottom: 0 }} value={step}
-                         onChange={e => updateStep(i, e.target.value)}
-                         placeholder={`Step ${i + 1}`} />
-                  {form.steps.length > 1 && (
-                    <button type="button" className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => removeStep(i)}>✕</button>
-                  )}
-                </div>
-              ))}
-              <button type="button" className="admin-btn admin-btn-ghost admin-btn-sm"
-                      style={{ marginTop: '0.25rem' }} onClick={addStep}>+ Add Step</button>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Campaign Image / Logo</label>
-              <ImageUpload value={form.imageUrl}
-                           onChange={url => setForm(f => ({ ...f, imageUrl: url }))}
-                           path="community/image" />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Image Card Background Color</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <input type="color" value={form.imageBg}
-                       onChange={e => setForm(f => ({ ...f, imageBg: e.target.value }))}
-                       style={{ width: 44, height: 36, padding: 2, borderRadius: 6, border: '1px solid var(--border)', cursor: 'pointer', background: 'none' }} />
-                <input className="form-input" value={form.imageBg}
-                       onChange={e => setForm(f => ({ ...f, imageBg: e.target.value }))}
-                       placeholder="#1e3a2f" style={{ flex: 1 }} />
+  const editor = sel === null
+    ? <EmptyState title="Select a campaign" sub="Pick a campaign on the left to edit it." onAdd={openAdd} addLabel="Add campaign" />
+    : (
+      <EditorPanel key={sel} title={isNew ? 'Add campaign' : 'Edit campaign'} meta={isNew ? 'New' : form.headline}
+                   onSave={save} onCancel={() => setSel(null)} saveLabel={isNew ? 'Add campaign' : 'Save changes'} saving={saving}
+                   deleteSlot={!isNew && <ConfirmDelete noun="campaign" onConfirm={() => remove(sel)} />}>
+        <Field label="Headline" tag="required" htmlFor="cm-h">
+          <input id="cm-h" className="ad-input" value={form.headline} placeholder="Support the Next Generation." onChange={e => set('headline', e.target.value)} />
+        </Field>
+        <Field label="Description" htmlFor="cm-d">
+          <textarea id="cm-d" className="ad-input ad-textarea" rows={3} value={form.description} onChange={e => set('description', e.target.value)} />
+        </Field>
+        <Field label="Steps">
+          <div className="ad-steps">
+            {form.steps.map((step, i) => (
+              <div key={i} className="ad-step">
+                <span className="ad-step-n">{i + 1}</span>
+                <input className="ad-input" aria-label={`Step ${i + 1}`} value={step} placeholder={`Step ${i + 1}`}
+                       onChange={e => updateStep(i, e.target.value)} />
+                {form.steps.length > 1 && (
+                  <button type="button" className="ad-icon-btn" aria-label={`Remove step ${i + 1}`} onClick={() => removeStep(i)}>✕</button>
+                )}
               </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Link URL (optional)</label>
-                <input className="form-input" value={form.linkUrl}
-                       onChange={e => setForm(f => ({ ...f, linkUrl: e.target.value }))}
-                       placeholder="https://kroger.com/…" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Link Label</label>
-                <input className="form-input" value={form.linkLabel}
-                       onChange={e => setForm(f => ({ ...f, linkLabel: e.target.value }))}
-                       placeholder="Learn More" />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Downloadable File (optional)</label>
-              <FileUpload value={form.fileUrl}
-                          onChange={url => setForm(f => ({ ...f, fileUrl: url }))}
-                          path="community/file" />
-            </div>
-            {form.fileUrl && (
-              <div className="form-group">
-                <label className="form-label">File Button Label</label>
-                <input className="form-input" value={form.fileLabel}
-                       onChange={e => setForm(f => ({ ...f, fileLabel: e.target.value }))}
-                       placeholder="Download Info Sheet" />
-              </div>
-            )}
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-primary" onClick={save} disabled={saving}>
-                {saving ? 'Saving…' : 'Save Campaign'}
-              </button>
-              <button className="admin-btn admin-btn-ghost" onClick={() => setMode('list')}>Cancel</button>
-            </div>
+            ))}
+            <button type="button" className="ad-btn ad-btn-ghost ad-btn-sm" onClick={addStep}>+ Add step</button>
           </div>
-        </div>
-      </div>
+        </Field>
+        <Field label="Campaign image / logo" span={1}>
+          <ImageUpload value={form.imageUrl} onChange={url => set('imageUrl', url)} path="community/image" />
+        </Field>
+        <Field label="Image card background" span={1} htmlFor="cm-bg">
+          <div className="ad-color">
+            <input type="color" aria-label="Pick background colour" value={form.imageBg} onChange={e => set('imageBg', e.target.value)} />
+            <input id="cm-bg" className="ad-input" value={form.imageBg} placeholder="#1e3a2f" onChange={e => set('imageBg', e.target.value)} />
+          </div>
+        </Field>
+        <Field label="Link URL" tag="optional" span={1} htmlFor="cm-url">
+          <input id="cm-url" className="ad-input" value={form.linkUrl} placeholder="https://kroger.com/…" onChange={e => set('linkUrl', e.target.value)} />
+        </Field>
+        <Field label="Link label" tag="optional" span={1} htmlFor="cm-ul">
+          <input id="cm-ul" className="ad-input" value={form.linkLabel} placeholder="Learn More" onChange={e => set('linkLabel', e.target.value)} />
+        </Field>
+        <Field label="Downloadable file" tag="optional">
+          <FileUpload value={form.fileUrl} onChange={url => set('fileUrl', url)} path="community/file" />
+        </Field>
+        {form.fileUrl && (
+          <Field label="File button label" htmlFor="cm-fl">
+            <input id="cm-fl" className="ad-input" value={form.fileLabel} placeholder="Download Info Sheet" onChange={e => set('fileLabel', e.target.value)} />
+          </Field>
+        )}
+      </EditorPanel>
     );
-  }
 
-  /* ── List view ── */
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-        <div>
-          <div className="admin-page-title">Community</div>
-          <div className="admin-page-sub">Manage community campaigns shown on the public site. Two or more campaigns appear as a slider.</div>
-        </div>
-        <button className="admin-btn admin-btn-primary" onClick={openAdd}>+ New Campaign</button>
-      </div>
-
-      {campaigns.length === 0 && (
-        <div className="admin-empty">No campaigns yet. Click "New Campaign" to create one.</div>
-      )}
-
-      <div className="admin-list">
-        {campaigns.map(c => (
-          <div key={c.id} className="admin-list-item">
-            {c.imageUrl && (
-              <div style={{ width: 48, height: 30, background: c.imageBg || '#333', borderRadius: 4, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <img src={c.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 2 }} />
-              </div>
-            )}
-            <div className="admin-list-item-info">
-              <strong>{c.headline}</strong>
-              <span>{c.steps?.length || 0} steps</span>
-            </div>
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={() => moveUp(c)}>↑</button>
-              <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={() => moveDown(c)}>↓</button>
-              <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={() => openEdit(c)}>Edit</button>
-              <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => remove(c.id)}>✕</button>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="ad-screen">
+      <PageHead title="Community" sub="Campaign blocks on the public site. More than one becomes a slider. Arrows reorder and save right away." />
+      <SplitLayout
+        countLabel={`${campaigns.length} campaign${campaigns.length === 1 ? '' : 's'}`}
+        addLabel="Add campaign" onAdd={openAdd}
+        list={campaigns.length === 0
+          ? <EmptyState title="No campaigns yet" sub="Add the first community campaign." />
+          : campaigns.map((c, i) => (
+            <ListRow key={c.id} title={c.headline} sub={`${c.steps?.length || 0} steps`}
+                     thumb={{ kind: 'campaign', src: c.imageUrl, bg: c.imageBg || '#1e3a2f' }}
+                     selected={sel === c.id} onSelect={() => openEdit(c)}
+                     onUp={() => swap(c, -1)} onDown={() => swap(c, 1)}
+                     upDisabled={i === 0} downDisabled={i === campaigns.length - 1} />
+          ))}
+        editor={editor}
+      />
     </div>
   );
 }

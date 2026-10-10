@@ -28,21 +28,18 @@ export default function ImageUpload({ value, onChange, path, portrait = false })
   return (
     <div className="img-upload-wrap">
       {value
-        ? <img src={value} className={`img-upload-preview ${cls}`} alt="preview" />
-        : <div className={`img-upload-placeholder ${cls}`}>📷</div>
+        ? <img src={value} className={`img-upload-preview ${cls}`} alt="" />
+        : <div className={`img-upload-placeholder ${cls}`}>None</div>
       }
-      <div className="img-upload-row">
-        <input ref={inputRef} type="file" accept="image/*" className="img-upload-input" onChange={handleFile} />
-        <button type="button" className="admin-btn admin-btn-ghost admin-btn-sm"
-                onClick={() => inputRef.current?.click()} disabled={uploading}>
-          {uploading ? '' : '↑ Upload'}
-        </button>
-        {uploading && <span className="img-uploading">Uploading…</span>}
-        {value && !uploading && (
-          <button type="button" className="admin-btn admin-btn-danger admin-btn-sm"
-                  onClick={() => onChange('')}>✕</button>
-        )}
-      </div>
+      <span className="img-upload-note">{uploading ? 'Uploading…' : portrait ? 'Portrait crop' : 'JPG, PNG or WebP'}</span>
+      <input ref={inputRef} type="file" accept="image/*" className="img-upload-input" onChange={handleFile} />
+      <button type="button" className="ad-btn ad-btn-outline ad-btn-sm"
+              onClick={() => inputRef.current?.click()} disabled={uploading}>
+        {value ? 'Replace' : 'Upload'}
+      </button>
+      {value && !uploading && (
+        <button type="button" className="ad-icon-btn" aria-label="Clear image" onClick={() => onChange('')}>✕</button>
+      )}
     </div>
   );
 }

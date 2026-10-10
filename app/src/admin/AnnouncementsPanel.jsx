@@ -4,8 +4,10 @@ import { db } from '../lib/firebase';
 import { useAnnouncements } from '../hooks/useAnnouncements';
 import ImageUpload from './ImageUpload';
 import FileUpload from './FileUpload';
+import { SplitLayout, ListRow, EditorPanel, ConfirmDelete, Field, PageHead, EmptyState, Chip } from './ui';
 
 const TAGS = ['Announcement', 'Signing', 'Tournament', 'Award'];
+const TAG_TONE = { Signing: 'pink', Tournament: 'blue', Announcement: 'neutral', Award: 'warm' };
 const EMPTY_FORM = { title: '', body: '', tag: 'Announcement', photoUrl: '', linkUrl: '', linkLabel: '', date: '', fileUrl: '', fileLabel: '' };
 
 function todayLabel() {
@@ -14,9 +16,8 @@ function todayLabel() {
 
 export default function AnnouncementsPanel({ toast }) {
   const { announcements } = useAnnouncements(100);
-  const [mode, setMode] = useState('list');
+  const [sel, setSel] = useState(null); // id | 'new' | null
   const [form, setForm] = useState(EMPTY_FORM);
-  const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const [localList, setLocalList] = useState([]);
@@ -25,22 +26,15 @@ export default function AnnouncementsPanel({ toast }) {
   const isDirtyRef = useRef(false);
 
   useEffect(() => {
+     
     if (!isDirtyRef.current) setLocalList(announcements);
   }, [announcements]);
 
-  function moveUp(i) {
-    if (i === 0) return;
+  function move(i, dir) {
+    const j = i + dir;
+    if (j < 0 || j >= localList.length) return;
     const next = [...localList];
-    [next[i - 1], next[i]] = [next[i], next[i - 1]];
-    setLocalList(next);
-    isDirtyRef.current = true;
-    setIsDirty(true);
-  }
-
-  function moveDown(i) {
-    if (i === localList.length - 1) return;
-    const next = [...localList];
-    [next[i], next[i + 1]] = [next[i + 1], next[i]];
+    [next[i], next[j]] = [next[j], next[i]];
     setLocalList(next);
     isDirtyRef.current = true;
     setIsDirty(true);
@@ -55,11 +49,8 @@ export default function AnnouncementsPanel({ toast }) {
   async function saveOrder() {
     setSavingOrder(true);
     try {
-      await Promise.all(
-        localList.map((post, i) =>
-          setDoc(doc(db, 'announcements', post.id), { sort: i + 1 }, { merge: true })
-        )
-      );
+      await Promise.all(localList.map((post, i) =>
+        setDoc(doc(db, 'announcements', post.id), { sort: i + 1 }, { merge: true })));
       toast('Order saved ✓');
       isDirtyRef.current = false;
       setIsDirty(false);
@@ -73,15 +64,14 @@ export default function AnnouncementsPanel({ toast }) {
 
   function openAdd() {
     setForm({ ...EMPTY_FORM, date: todayLabel() });
-    setEditingId(null);
-    setMode('add');
+    setSel('new');
   }
 
   function openEdit(post) {
+    // eslint-disable-next-line no-unused-vars
     const { id, createdAt, ...rest } = post;
     setForm({ ...EMPTY_FORM, ...rest });
-    setEditingId(id);
-    setMode('edit');
+    setSel(id);
   }
 
   async function save() {
@@ -90,13 +80,13 @@ export default function AnnouncementsPanel({ toast }) {
     setSaving(true);
     try {
       const payload = { ...form, createdAt: Timestamp.now() };
-      if (mode === 'edit' && editingId) {
-        await setDoc(doc(db, 'announcements', editingId), payload);
+      if (sel !== 'new') {
+        await setDoc(doc(db, 'announcements', sel), payload);
       } else {
-        await addDoc(collection(db, 'announcements'), { ...payload, sort: 0 });
+        const r = await addDoc(collection(db, 'announcements'), { ...payload, sort: 0 });
+        setSel(r.id);
       }
       toast('Saved ✓');
-      setMode('list');
     } catch (err) {
       console.error(err);
       toast('Save failed', 'error');
@@ -106,151 +96,85 @@ export default function AnnouncementsPanel({ toast }) {
   }
 
   async function remove(id) {
-    if (!window.confirm('Delete this announcement?')) return;
     try {
       await deleteDoc(doc(db, 'announcements', id));
+      setSel(null);
       toast('Deleted ✓');
     } catch {
       toast('Delete failed', 'error');
     }
   }
 
-  /* ── Add / Edit form ── */
-  if (mode === 'add' || mode === 'edit') {
-    return (
-      <div>
-        <button className="admin-back" onClick={() => setMode('list')}>← Announcements</button>
-        <div className="admin-page-title">{mode === 'add' ? 'New Post' : 'Edit Post'}</div>
-        <div className="admin-card">
-          <div className="admin-form">
-            <div className="form-group">
-              <label className="form-label">Title</label>
-              <input className="form-input" value={form.title}
-                     onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                     placeholder="Emma Johnson Signs with Purdue University" />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Body</label>
-              <textarea className="form-textarea" rows={4} value={form.body}
-                        onChange={e => setForm(f => ({ ...f, body: e.target.value }))}
-                        placeholder="We are incredibly proud of Emma and her commitment…" />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Tag</label>
-                <select className="form-select" value={form.tag}
-                        onChange={e => setForm(f => ({ ...f, tag: e.target.value }))}>
-                  {TAGS.map(t => <option key={t}>{t}</option>)}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Display Date</label>
-                <input className="form-input" value={form.date}
-                       onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-                       placeholder="Apr 18, 2026" />
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Photo (optional)</label>
-              <ImageUpload value={form.photoUrl}
-                           onChange={url => setForm(f => ({ ...f, photoUrl: url }))}
-                           path="announcements/photo" />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Link URL (optional)</label>
-                <input className="form-input" value={form.linkUrl}
-                       onChange={e => setForm(f => ({ ...f, linkUrl: e.target.value }))}
-                       placeholder="https://example.com/article" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Link Label</label>
-                <input className="form-input" value={form.linkLabel}
-                       onChange={e => setForm(f => ({ ...f, linkLabel: e.target.value }))}
-                       placeholder="Read more" />
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Downloadable File (optional)</label>
-              <FileUpload value={form.fileUrl}
-                          onChange={url => setForm(f => ({ ...f, fileUrl: url }))}
-                          path="announcements/file" />
-            </div>
-            {form.fileUrl && (
-              <div className="form-group">
-                <label className="form-label">File Button Label</label>
-                <input className="form-input" value={form.fileLabel}
-                       onChange={e => setForm(f => ({ ...f, fileLabel: e.target.value }))}
-                       placeholder="Download Flyer" />
-              </div>
-            )}
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-primary" onClick={save} disabled={saving}>
-                {saving ? 'Saving…' : 'Save Post'}
-              </button>
-              <button className="admin-btn admin-btn-ghost" onClick={() => setMode('list')}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      </div>
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const isNew = sel === 'new';
+
+  const editor = sel === null
+    ? <EmptyState title="Select a post" sub="Pick a post on the left to edit it, or write a new one." onAdd={openAdd} addLabel="New post" />
+    : (
+      <EditorPanel key={sel} title={isNew ? 'New post' : 'Edit post'} meta={isNew ? 'New' : form.title}
+                   onSave={save} onCancel={() => setSel(null)} saveLabel={isNew ? 'Publish post' : 'Save changes'} saving={saving}
+                   deleteSlot={!isNew && <ConfirmDelete noun="post" onConfirm={() => remove(sel)} />}>
+        <Field label="Title" tag="required" htmlFor="an-title">
+          <input id="an-title" className="ad-input" value={form.title} placeholder="Emma Johnson Signs with Purdue University" onChange={e => set('title', e.target.value)} />
+        </Field>
+        <Field label="Body" tag="required" htmlFor="an-body">
+          <textarea id="an-body" className="ad-input ad-textarea" rows={5} value={form.body} onChange={e => set('body', e.target.value)} />
+        </Field>
+        <Field label="Tag" span={1} htmlFor="an-tag">
+          <select id="an-tag" className="ad-input" value={form.tag} onChange={e => set('tag', e.target.value)}>
+            {TAGS.map(t => <option key={t}>{t}</option>)}
+          </select>
+        </Field>
+        <Field label="Display date" span={1} hint="A label, typed as you want it shown." htmlFor="an-date">
+          <input id="an-date" className="ad-input" value={form.date} placeholder="Apr 18, 2026" onChange={e => set('date', e.target.value)} />
+        </Field>
+        <Field label="Photo" tag="optional">
+          <ImageUpload value={form.photoUrl} onChange={url => set('photoUrl', url)} path="announcements/photo" />
+        </Field>
+        <Field label="Link URL" tag="optional" span={1} htmlFor="an-url">
+          <input id="an-url" className="ad-input" value={form.linkUrl} placeholder="https://" onChange={e => set('linkUrl', e.target.value)} />
+        </Field>
+        <Field label="Link label" tag="optional" span={1} htmlFor="an-ul">
+          <input id="an-ul" className="ad-input" value={form.linkLabel} placeholder="Read more" onChange={e => set('linkLabel', e.target.value)} />
+        </Field>
+        <Field label="Downloadable file" tag="optional">
+          <FileUpload value={form.fileUrl} onChange={url => set('fileUrl', url)} path="announcements/file" />
+        </Field>
+        {form.fileUrl && (
+          <Field label="File button label" htmlFor="an-fl">
+            <input id="an-fl" className="ad-input" value={form.fileLabel} placeholder="Download Flyer" onChange={e => set('fileLabel', e.target.value)} />
+          </Field>
+        )}
+      </EditorPanel>
     );
-  }
 
-  /* ── List view ── */
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-        <div>
-          <div className="admin-page-title">Announcements</div>
-          <div className="admin-page-sub">Use ↑ ↓ to reorder, then Save Order. New posts appear first until ordered.</div>
-        </div>
-        <button className="admin-btn admin-btn-primary" onClick={openAdd}>+ New Post</button>
-      </div>
-
-      {isDirty && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem', padding: '0.75rem 1rem', background: 'rgba(255,31,109,0.08)', border: '1px solid rgba(255,31,109,0.25)', borderRadius: '8px', fontSize: '0.83rem' }}>
-          <span style={{ flex: 1, color: 'var(--fg)' }}>Unsaved order changes</span>
-          <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={resetOrder}>Reset</button>
-          <button className="admin-btn admin-btn-primary admin-btn-sm" onClick={saveOrder} disabled={savingOrder}>
-            {savingOrder ? 'Saving…' : 'Save Order'}
-          </button>
-        </div>
-      )}
-
-      {localList.length === 0 && (
-        <div className="admin-empty">No posts yet. Click "New Post" to create one.</div>
-      )}
-
-      <div className="admin-list">
-        {localList.map((post, i) => (
-          <div key={post.id} className="admin-list-item">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginRight: '0.5rem' }}>
-              <button
-                className="admin-btn admin-btn-ghost admin-btn-sm"
-                style={{ padding: '0 0.4rem', lineHeight: 1.2, minWidth: 0 }}
-                onClick={() => moveUp(i)}
-                disabled={i === 0}
-                aria-label="Move up"
-              >↑</button>
-              <button
-                className="admin-btn admin-btn-ghost admin-btn-sm"
-                style={{ padding: '0 0.4rem', lineHeight: 1.2, minWidth: 0 }}
-                onClick={() => moveDown(i)}
-                disabled={i === localList.length - 1}
-                aria-label="Move down"
-              >↓</button>
-            </div>
-            <div className="admin-list-item-info">
-              <strong>{post.title}</strong>
-              <span>{post.date} · {post.tag}</span>
-            </div>
-            <div className="admin-actions">
-              <button className="admin-btn admin-btn-ghost admin-btn-sm" onClick={() => openEdit(post)}>Edit</button>
-              <button className="admin-btn admin-btn-danger admin-btn-sm" onClick={() => remove(post.id)}>✕</button>
-            </div>
+    <div className="ad-screen">
+      <PageHead title="Announcements" sub="Posts in “Latest updates”. Reorder with the arrows, then save the order. New posts start at the top." />
+      <SplitLayout
+        countLabel={`${localList.length} post${localList.length === 1 ? '' : 's'}`}
+        addLabel="New post" onAdd={openAdd}
+        before={
+          <div className={`ad-order-bar ${isDirty ? 'is-open' : ''}`} aria-hidden={!isDirty}>
+            <span>Order changed. Not saved yet.</span>
+            <button type="button" className="ad-btn ad-btn-sm ad-btn-on-ink" onClick={resetOrder} tabIndex={isDirty ? 0 : -1}>Reset</button>
+            <button type="button" className="ad-btn ad-btn-sm ad-btn-on-ink-primary" onClick={saveOrder} disabled={savingOrder} tabIndex={isDirty ? 0 : -1}>
+              {savingOrder ? 'Saving…' : 'Save order'}
+            </button>
           </div>
-        ))}
-      </div>
+        }
+        list={localList.length === 0
+          ? <EmptyState title="No posts yet" sub="Write the first post for Latest updates." />
+          : localList.map((post, i) => (
+            <ListRow key={post.id} title={post.title} sub={post.date}
+                     thumb={{ kind: 'photo', src: post.photoUrl }}
+                     chips={[<Chip key="t" tone={TAG_TONE[post.tag] || 'neutral'}>{post.tag}</Chip>]}
+                     selected={sel === post.id} onSelect={() => openEdit(post)}
+                     onUp={() => move(i, -1)} onDown={() => move(i, 1)}
+                     upDisabled={i === 0} downDisabled={i === localList.length - 1} />
+          ))}
+        editor={editor}
+      />
     </div>
   );
 }
