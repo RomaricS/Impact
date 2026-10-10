@@ -1,6 +1,7 @@
 import Nav from '../components/Nav';
 import Hero from '../components/Hero';
 import Ticker from '../components/Ticker';
+import Stats from '../components/Stats';
 import Announcements from '../components/Announcements';
 import Teams from '../components/Teams';
 import Tryouts from '../components/Tryouts';
@@ -19,6 +20,7 @@ export default function Home({ theme, toggleTheme }) {
       <Nav theme={theme} toggleTheme={toggleTheme} />
       <Hero />
       <Ticker />
+      <Stats />
       <Announcements />
       <Teams teams={teams} loading={loading} />
       <Tryouts />

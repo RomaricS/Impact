@@ -472,6 +472,49 @@ nav {
   .ticker-track { animation: none; }
 }
 
+/* STATS */
+.stats-sec {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 72px 24px 24px;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.stats-cell {
+  padding: 24px 28px;
+  border-right: 1px solid var(--line);
+}
+.stats-cell:last-child { border-right: none; }
+.stats-num {
+  font-family: 'Archivo', sans-serif;
+  font-stretch: 125%;
+  font-weight: 800;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.stats-lbl {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 6px;
+}
+@media (max-width: 640px) {
+  .stats-sec { padding: 40px 16px 16px; }
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); border-radius: 18px; }
+  .stats-cell { padding: 16px 18px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stats-cell:nth-child(2n) { border-right: none; }
+  .stats-cell:nth-last-child(-n+2) { border-bottom: none; }
+  .stats-num { font-size: 23px; }
+  .stats-lbl { font-size: 13px; margin-top: 4px; }
+}
+
 /* SECTIONS */
 .sec { padding: 110px 2.5rem; }
 .container { max-width: 1260px; margin: 0 auto; }
