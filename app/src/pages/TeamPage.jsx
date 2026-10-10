@@ -58,7 +58,7 @@ export default function TeamPage({ theme, toggleTheme }) {
     <>
       <Nav theme={theme} toggleTheme={toggleTheme} />
 
-      <section className="tp-hero">
+      <section className={`tp-hero ${team.color === 'pink' ? 'tp-hero-pink' : ''}`}>
         <div className="tp-hero-inner">
           <nav aria-label="Breadcrumb" className="tp-crumb">
             <Link to="/#teams">{content.nav.links.find(l => l.anchor === 'teams')?.label || 'Teams'}</Link>

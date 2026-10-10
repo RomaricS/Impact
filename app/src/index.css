@@ -917,6 +917,7 @@ footer {
 /* TEAM PAGE */
 .team-card { text-decoration: none; }
 .tp-hero { background: var(--sky); color: var(--on-accent); position: relative; overflow: hidden; padding-top: 77px; }
+.tp-hero-pink { background: var(--pink); }
 .tp-hero-inner { max-width: 1240px; margin: 0 auto; padding: 28px 24px 0; position: relative; }
 .tp-crumb { font-size: 14px; font-weight: 500; }
 .tp-crumb a { color: var(--on-accent); }
