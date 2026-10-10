@@ -85,11 +85,11 @@ function Calendar({ tournaments, practices }) {
     .sort((a, b) => dateToNum(a.date) - dateToNum(b.date));
 
   return (
-    <div>
+    <div className="cal-card">
       <div className="cal-hdr">
-        <button className="cal-nav-btn" onClick={() => { if (month === 0) { setMonth(11); setYear(y => y-1); } else setMonth(m => m-1); }}>‹</button>
+        <button className="cal-nav-btn" onClick={() => { if (month === 0) { setMonth(11); setYear(y => y-1); } else setMonth(m => m-1); }} aria-label="Previous month">‹</button>
         <span className="cal-month-lbl">{MONTHS[month]} {year}</span>
-        <button className="cal-nav-btn" onClick={() => { if (month === 11) { setMonth(0); setYear(y => y+1); } else setMonth(m => m+1); }}>›</button>
+        <button className="cal-nav-btn" onClick={() => { if (month === 11) { setMonth(0); setYear(y => y+1); } else setMonth(m => m+1); }} aria-label="Next month">›</button>
       </div>
 
       <div className="cal-legend">
@@ -142,7 +142,12 @@ function Calendar({ tournaments, practices }) {
 
       <div className="upcoming-lbl">Upcoming Tournaments</div>
       <div className="evt-list">
-        {upcoming.length === 0 && <div style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>No upcoming tournaments.</div>}
+        {upcoming.length === 0 && (
+          <div className="evt-empty">
+            <div className="evt-empty-title">No upcoming tournaments</div>
+            <div className="evt-empty-sub">Dates appear here as soon as they are posted.</div>
+          </div>
+        )}
         {upcoming.map((t, i) => {
           const d = new Date(t.date + 'T12:00:00');
           return (
@@ -176,6 +181,7 @@ export default function TeamDrawer({ team, onClose }) {
   }, []);
 
   const roster = team.roster || [];
+  const coaches = team.coaches || [];
   const positions = ['All', ...POSITIONS];
   const filtered = posFilter === 'All' ? roster : roster.filter(p => p.pos === posFilter || p.pos2 === posFilter);
 
@@ -191,27 +197,39 @@ export default function TeamDrawer({ team, onClose }) {
       <div className="panel-bd open" onClick={onClose} />
       <div className="team-panel open">
         <div className="pnl-hdr">
-          <button className="pnl-close" onClick={onClose}>
+          <button className="pnl-close" onClick={onClose} aria-label="Close">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
-          <div>
-            <div className="pnl-title">{team.name}</div>
-            <div className="pnl-sub">{team.sub}</div>
-          </div>
-          <span className={`pnl-badge ${team.color === 'pink' ? 'pill-p' : 'pill-b'}`}>
-            {team.division}
-          </span>
-        </div>
 
-        <div className="pnl-tabs">
-          {tabs.map(t => (
-            <button key={t.id} className={`pnl-tab ${tab === t.id ? 'on' : ''}`}
-                    onClick={() => setTab(t.id)}>
-              {t.label}
-            </button>
-          ))}
+          <div className="pnl-eyebrow">
+            <span className="pnl-badge">{team.division}</span>
+            <span className="pnl-ages">{team.sub}</span>
+          </div>
+
+          <div className="pnl-title-row">
+            <div className="pnl-title">{team.name}</div>
+            <dl className="pnl-counts">
+              <div className="pnl-count">
+                <dt>Players</dt>
+                <dd>{roster.length}</dd>
+              </div>
+              <div className="pnl-count">
+                <dt>Coaches</dt>
+                <dd>{coaches.length}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="pnl-tabs">
+            {tabs.map(t => (
+              <button key={t.id} className={`pnl-tab ${tab === t.id ? 'on' : ''}`}
+                      onClick={() => setTab(t.id)}>
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="pnl-body">
@@ -223,6 +241,10 @@ export default function TeamDrawer({ team, onClose }) {
 
           {tab === 'roster' && (
             <div className="pnl-pane">
+              <div className="pane-hdr">
+                <div className="pane-title">Roster</div>
+                <p className="pane-count">{filtered.length} player{filtered.length === 1 ? '' : 's'}</p>
+              </div>
               <div className="pos-filter">
                 {positions.map(p => (
                   <button key={p} className={`pos-btn ${posFilter === p ? 'on' : ''}`}
@@ -235,22 +257,25 @@ export default function TeamDrawer({ team, onClose }) {
                     <div className="player-photo-wrap">
                       {p.photo
                         ? <img className="player-photo" src={p.photo} alt={p.name} />
-                        : <div className="player-photo-placeholder">#{p.num || '—'}</div>
+                        : <div className="player-photo-placeholder">Player photo</div>
                       }
+                      {p.num > 0 && <div className="player-num">{p.num}</div>}
                     </div>
-                    {p.num > 0 && <div className="player-num">#{p.num}</div>}
-                    <div className="player-name">{p.name}</div>
-                    <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                      {p.pos && <div className="player-pos-badge">{p.pos}</div>}
-                      {p.pos2 && <div className="player-pos-badge">{p.pos2}</div>}
+                    <div className="player-card-body">
+                      <div className="player-name">{p.name}</div>
+                      {(p.pos || p.pos2) && (
+                        <div className="player-badges">
+                          {p.pos && <span className="player-pos-badge primary">{p.pos}</span>}
+                          {p.pos2 && <span className="player-pos-badge">{p.pos2}</span>}
+                        </div>
+                      )}
+                      {(p.gradYear || p.school) && (
+                        <div className="player-meta">
+                          {p.school && <span>{p.school}</span>}
+                          {p.gradYear && <span>Class of {p.gradYear}</span>}
+                        </div>
+                      )}
                     </div>
-                    {(p.gradYear || p.school) && (
-                      <div style={{ fontSize: '0.62rem', color: 'var(--muted)', marginTop: '0.3rem', lineHeight: 1.4 }}>
-                        {p.school && <span>{p.school}</span>}
-                        {p.gradYear && p.school && ' · '}
-                        {p.gradYear && <span>'{String(p.gradYear).slice(-2)}</span>}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
@@ -259,37 +284,34 @@ export default function TeamDrawer({ team, onClose }) {
 
           {tab === 'practices' && (
             <div className="pnl-pane">
-              <div className="practice-cards">
-                {(team.practices || []).map((p, i) => (
-                  <div key={i} className="practice-crd">
-                    <div className="prac-day">{p.day.slice(0,3).toUpperCase()}</div>
-                    <div className="prac-info">
-                      <div className="prac-time">{p.time}</div>
-                      <div className="prac-loc">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        {p.location} · {p.address}
-                      </div>
+              <div className="practice-card">
+                <div className="pane-title">Practices</div>
+                <div className="practice-rows">
+                  {(team.practices || []).map((p, i) => (
+                    <div key={i} className="practice-row">
+                      <span className="prac-day">{p.day}</span>
+                      {p.type && <span className="prac-type">{p.type}</span>}
+                      <span className="prac-time">{p.time} · {p.location}</span>
+                      <span className="prac-addr">{p.address}</span>
                     </div>
-                    {p.type && <div className="prac-type">{p.type}</div>}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
           {tab === 'coaches' && (
             <div className="pnl-pane">
+              <div className="pane-title">Coaches</div>
               <div className="coach-cards">
-                {(team.coaches || []).map((c, i) => (
+                {coaches.map((c, i) => (
                   <div key={i} className="coach-card">
                     <div className="coach-avatar">
                       {c.photo ? <img src={c.photo} alt={c.name} /> : initials(c.name)}
                     </div>
                     <div className="coach-info">
-                      <div className="coach-name">{c.name}</div>
                       <div className="coach-title">{c.title}</div>
+                      <div className="coach-name">{c.name}</div>
                       <div className="coach-bio">{c.bio}</div>
                     </div>
                   </div>
