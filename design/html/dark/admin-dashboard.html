@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin dashboard (dark) — design reference</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+
+
+body{margin:0}
+.il-root{--ground:#F3F5F7;--surface:#FFFFFF;--ink:#0D1117;--muted:#56606E;--body:#3A4350;--line:#DDE2E8;--line2:#B6BEC9;--chip:#E9ECF0;--inv-bg:#0D1117;--inv-fg:#FFFFFF;--blue-ink:#1A73C8;--blue-tint:#DCEEFB;--blue-tint-ink:#0F4F8A;--pink-tint:#FCE7F0;--pink-tint-ink:#A80F4B;--band-bg:#0D1117;--band-fg:#FFFFFF;--dot1:#E84388;--dot2:#55AEEB;--panel:#0D1117;--logo-bg:transparent;--danger-ink:#8A1222;--danger-line:#F3B6BD;--warn-bg:#FFF6DF;--warn-line:#F0C36D;color-scheme:light}
+.il-root[data-theme="dark"]{--ground:#0B0F15;--surface:#151B24;--ink:#F2F5F8;--muted:#9AA6B5;--body:#C3CBD6;--line:#283140;--line2:#3B4657;--chip:#232C39;--inv-bg:#F2F5F8;--inv-fg:#0D1117;--blue-ink:#6DBBF0;--blue-tint:#15324B;--blue-tint-ink:#9BD2F8;--pink-tint:#47162C;--pink-tint-ink:#F9A8CB;--band-bg:#E84388;--band-fg:#0D1117;--dot1:#0D1117;--dot2:#FFFFFF;--panel:#151B24;--logo-bg:#FFFFFF;--danger-ink:#FF9AA5;--danger-line:#5A1F27;--warn-bg:#33290F;--warn-line:#7A5E16;color-scheme:dark}
+.il-root,.il-root *{transition:background-color .35s ease,border-color .35s ease,color .35s ease}
+.il-root input,.il-root textarea,.il-root select{background:var(--surface);color:var(--ink)}
+</style>
+</head>
+<body>
+<!-- Static design reference exported from the design canvas. Styling is inline on purpose: read it as a spec, do not paste it into the app. Not interactive. -->
+<div style="display: contents;">
+
+<div style="min-height: 900px; background: #151B24">
+<div style="display: contents;"><div style="display: contents;">
+
+<div class="il-root" data-theme="dark" style="font-family: Archivo, system-ui, sans-serif; color: var(--ink); background: var(--surface); font-size: 15px; line-height: 1.45">
+
+
+
+
+
+
+<div style="display: flex; flex-wrap: wrap; min-height: 900px">
+
+<aside style="flex: 1 0 232px; max-width: 100%; box-sizing: border-box; background: var(--ground); border-right: 1px solid var(--line); padding: 16px 14px 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 6px">
+<img src="../../../assets/logo.png" alt="Impact Legends Volleyball" style="height: 60px; width: auto; display: block; background: var(--logo-bg); border-radius: 14px; padding: 2px 8px; box-sizing: border-box; margin-left: -6px">
+<div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted)">Admin</div>
+</div>
+<nav aria-label="Admin" style="display: flex; flex-wrap: wrap; gap: 4px">
+
+<button type="button" aria-current="page" style="flex: 1 1 150px; font: inherit; font-weight: 700; text-align: left; display: flex; align-items: center; gap: 12px; padding: 0 12px; height: 44px; border-radius: 12px; border: 0; cursor: pointer; background: var(--inv-bg); color: var(--inv-fg); transition: background-color .2s, color .2s">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z"></path></svg>
+<span style="flex: 1">Dashboard</span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; opacity: 0.75"></span>
+</button>
+
+<button type="button" style="flex: 1 1 150px; font: inherit; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 12px; padding: 0 12px; height: 44px; border-radius: 12px; border: 0; cursor: pointer; background: transparent; color: var(--ink); transition: background-color .2s, color .2s">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM21 19v-1a4 4 0 0 0-3-3.9M15.5 3.2a3.5 3.5 0 0 1 0 6.6"></path></svg>
+<span style="flex: 1">Teams</span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; opacity: 0.75">6</span>
+</button>
+
+<button type="button" style="flex: 1 1 150px; font: inherit; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 12px; padding: 0 12px; height: 44px; border-radius: 12px; border: 0; cursor: pointer; background: transparent; color: var(--ink); transition: background-color .2s, color .2s">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg>
+<span style="flex: 1">Sponsors</span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; opacity: 0.75">8</span>
+</button>
+
+<button type="button" style="flex: 1 1 150px; font: inherit; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 12px; padding: 0 12px; height: 44px; border-radius: 12px; border: 0; cursor: pointer; background: transparent; color: var(--ink); transition: background-color .2s, color .2s">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4h3l6 4V6L6 10H3zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"></path></svg>
+<span style="flex: 1">Announcements</span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; opacity: 0.75">3</span>
+</button>
+
+<button type="button" style="flex: 1 1 150px; font: inherit; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 12px; padding: 0 12px; height: 44px; border-radius: 12px; border: 0; cursor: pointer; background: transparent; color: var(--ink); transition: background-color .2s, color .2s">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"></path></svg>
+<span style="flex: 1">Community</span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; opacity: 0.75">1</span>
+</button>
+
+<button type="button" style="flex: 1 1 150px; font: inherit; font-weight: 500; text-align: left; display: flex; align-items: center; gap: 12px; padding: 0 12px; height: 44px; border-radius: 12px; border: 0; cursor: pointer; background: transparent; color: var(--ink); transition: background-color .2s, color .2s">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M16 5v4M8 15v4"></path></svg>
+<span style="flex: 1">Settings</span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; opacity: 0.75"></span>
+</button>
+
+</nav>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px">
+<button type="button" role="switch" aria-checked="" style="font: inherit; font-weight: 600; height: 44px; padding: 0 12px; border-radius: 12px; border: 0; background: transparent; color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px">Dark mode<span style="position: relative; flex: none; width: 44px; height: 26px; border-radius: 999px; background: #E84388; transition: background-color .3s"><span style="position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,.35); transform: translateX(18px); transition: transform .3s cubic-bezier(.2,.8,.2,1)"></span></span></button>
+<a href="#" style="text-decoration: none; color: var(--ink); text-align: center; padding: 11px 10px; border-radius: 999px; border: 1.5px solid var(--ink); background: var(--surface); font-weight: 600">View site ↗</a>
+<button type="button" style="font: inherit; font-weight: 600; height: 44px; border-radius: 999px; border: 0; background: transparent; color: var(--muted); cursor: pointer">Sign out</button>
+</div>
+</aside>
+
+<main id="il-admin-main" style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px clamp(16px, 3vw, 40px) 40px; display: flex; flex-direction: column; gap: 24px">
+
+
+
+<div><h1 style="margin: 0; font-stretch: 125%; font-weight: 800; font-size: 30px; letter-spacing: -0.02em; line-height: 1.1">Dashboard</h1><div style="color: var(--muted); margin-top: 4px">A read-only snapshot of what's on impactvbcfw.com.</div></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px">
+
+<div style="border-radius: 20px; padding: 22px 24px; background: var(--blue-tint); color: var(--ink); display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden">
+<span style="font-weight: 600">Teams</span>
+<span style="font-stretch: 125%; font-weight: 900; font-size: 64px; line-height: 0.95; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">6</span>
+<span style="font-size: 13px">5 Blue · 1 Pink</span>
+</div>
+
+<div style="border-radius: 20px; padding: 22px 24px; background: var(--pink-tint); color: var(--ink); display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden">
+<span style="font-weight: 600">Players</span>
+<span style="font-stretch: 125%; font-weight: 900; font-size: 64px; line-height: 0.95; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">8</span>
+<span style="font-size: 13px">Across all rosters</span>
+</div>
+
+<div style="border-radius: 20px; padding: 22px 24px; background: var(--chip); color: var(--ink); display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden">
+<span style="font-weight: 600">Tournaments</span>
+<span style="font-stretch: 125%; font-weight: 900; font-size: 64px; line-height: 0.95; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">1</span>
+<span style="font-size: 13px">Across all team schedules</span>
+</div>
+
+</div>
+
+<div style="border: 1px solid var(--warn-line); background: var(--warn-bg); border-radius: 16px; padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between">
+<div style="flex: 1 1 320px; min-width: 0"><strong>5 teams have empty rosters.</strong> 12 Blue, 14 Blue, 16 Blue, 16 Pink and 17 Blue show “0 players” on the public site.</div>
+<button type="button" style="font: inherit; font-weight: 600; height: 44px; padding: 0 18px; border-radius: 999px; border: 1.5px solid var(--ink); background: var(--surface); cursor: pointer">Open teams →</button>
+</div>
+
+<div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px"><h2 style="margin: 0; font-size: 18px; font-weight: 700">Quick access</h2><span style="color: var(--muted); font-size: 14px">Jump straight into a team's editor</span></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 14px">
+
+<button type="button" style="font: inherit; text-align: left; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: flex; align-items: center; gap: 16px; color: var(--ink)">
+<span style="font-stretch: 125%; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -0.04em; width: 74px; color: var(--blue-ink)">12</span>
+<span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 700; font-size: 16px">12 Blue</span><span style="display: block; color: var(--muted); font-size: 13px">Ages 12 &amp; Under · 0 players</span></span>
+<span aria-hidden="true" style="font-weight: 700">→</span>
+</button>
+
+<button type="button" style="font: inherit; text-align: left; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: flex; align-items: center; gap: 16px; color: var(--ink)">
+<span style="font-stretch: 125%; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -0.04em; width: 74px; color: var(--blue-ink)">14</span>
+<span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 700; font-size: 16px">14 Blue</span><span style="display: block; color: var(--muted); font-size: 13px">Ages 14 &amp; Under · 0 players</span></span>
+<span aria-hidden="true" style="font-weight: 700">→</span>
+</button>
+
+<button type="button" style="font: inherit; text-align: left; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: flex; align-items: center; gap: 16px; color: var(--ink)">
+<span style="font-stretch: 125%; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -0.04em; width: 74px; color: var(--blue-ink)">16</span>
+<span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 700; font-size: 16px">16 Blue</span><span style="display: block; color: var(--muted); font-size: 13px">Ages 16 &amp; Under · 0 players</span></span>
+<span aria-hidden="true" style="font-weight: 700">→</span>
+</button>
+
+<button type="button" style="font: inherit; text-align: left; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: flex; align-items: center; gap: 16px; color: var(--ink)">
+<span style="font-stretch: 125%; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -0.04em; width: 74px; color: #E84388">16</span>
+<span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 700; font-size: 16px">16 Pink</span><span style="display: block; color: var(--muted); font-size: 13px">Ages 16 &amp; Under · 0 players</span></span>
+<span aria-hidden="true" style="font-weight: 700">→</span>
+</button>
+
+<button type="button" style="font: inherit; text-align: left; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: flex; align-items: center; gap: 16px; color: var(--ink)">
+<span style="font-stretch: 125%; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -0.04em; width: 74px; color: var(--blue-ink)">17</span>
+<span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 700; font-size: 16px">17 Blue</span><span style="display: block; color: var(--muted); font-size: 13px">Ages 17 &amp; Under · 0 players</span></span>
+<span aria-hidden="true" style="font-weight: 700">→</span>
+</button>
+
+<button type="button" style="font: inherit; text-align: left; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; display: flex; align-items: center; gap: 16px; color: var(--ink)">
+<span style="font-stretch: 125%; font-weight: 900; font-size: 44px; line-height: 1; letter-spacing: -0.04em; width: 74px; color: var(--blue-ink)">18</span>
+<span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 700; font-size: 16px">18 Blue</span><span style="display: block; color: var(--muted); font-size: 13px">Ages 18 &amp; Under · 8 players</span></span>
+<span aria-hidden="true" style="font-weight: 700">→</span>
+</button>
+
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div aria-live="polite" style="position: sticky; bottom: 24px; align-self: flex-end; margin-top: auto; height: 0; display: flex; align-items: flex-end; pointer-events: none">
+<div style="background: var(--inv-bg); color: var(--inv-fg); font-weight: 600; padding: 14px 20px; border-radius: 14px; box-shadow: 0 16px 36px -14px rgba(13,17,23,.6); display: flex; align-items: center; gap: 10px; white-space: nowrap; transform: translateY(90px); opacity: 0; transition: transform .4s cubic-bezier(.2,1.2,.3,1), opacity .25s"><span style="width: 22px; height: 22px; border-radius: 50%; background: #55aeeb; color: #0d1117; display: flex; align-items: center; justify-content: center; font-size: 13px">✓</span>Saved</div>
+</div>
+
+</main>
+</div>
+
+
+</div>
+</div></div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+/* Impact Legends VBC — design tokens (light + dark)
+   Put the theme on the root element: <html data-theme="light|dark">.
+   Rename the variables to fit the codebase if you like; keep the values. */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* surfaces + text */
+  --ground: #F3F5F7;        /* page background, admin sidebar */
+  --surface: #FFFFFF;       /* cards, inputs, admin main area */
+  --ink: #0D1117;           /* primary text, outline-button borders */
+  --body: #3A4350;          /* long-form body text */
+  --muted: #56606E;         /* captions, labels, helper text */
+  --line: #DDE2E8;          /* card and divider borders */
+  --line2: #B6BEC9;         /* input borders */
+  --chip: #E9ECF0;          /* neutral chips, placeholder fills */
+
+  /* inverted pair: primary buttons, selected nav item, toast */
+  --inv-bg: #0D1117;
+  --inv-fg: #FFFFFF;
+
+  /* brand (sampled from the logo) */
+  --pink: #E84388;          /* accent fill. Text ON pink is always #0D1117, never white */
+  --sky: #55AEEB;           /* accent fill. Text ON sky is always #0D1117 */
+  --on-accent: #0D1117;
+
+  /* team colours */
+  --blue-ink: #1A73C8;      /* big numerals for Blue teams */
+  --blue-tint: #DCEEFB;  --blue-tint-ink: #0F4F8A;   /* Blue pill / chip */
+  --pink-tint: #FCE7F0;  --pink-tint-ink: #A80F4B;   /* Pink pill / chip */
+
+  /* ticker band under the hero */
+  --band-bg: #0D1117;  --band-fg: #FFFFFF;  --dot1: #E84388;  --dot2: #55AEEB;
+
+  /* dark feature panel (Community section) */
+  --panel: #0D1117;
+
+  /* logo backing: the logo only reads on a light background */
+  --logo-bg: transparent;
+
+  /* status */
+  --danger: #A3162A;        /* destructive fill, white text */
+  --danger-ink: #8A1222;  --danger-line: #F3B6BD;
+  --warn-bg: #FFF6DF;  --warn-line: #F0C36D;
+  --ok: #1F8A4C;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ground: #0B0F15;
+  --surface: #151B24;
+  --ink: #F2F5F8;
+  --body: #C3CBD6;
+  --muted: #9AA6B5;
+  --line: #283140;
+  --line2: #3B4657;
+  --chip: #232C39;
+
+  --inv-bg: #F2F5F8;
+  --inv-fg: #0D1117;
+
+  /* --pink, --sky and --on-accent do not change */
+
+  --blue-ink: #6DBBF0;
+  --blue-tint: #15324B;  --blue-tint-ink: #9BD2F8;
+  --pink-tint: #47162C;  --pink-tint-ink: #F9A8CB;
+
+  --band-bg: #E84388;  --band-fg: #0D1117;  --dot1: #0D1117;  --dot2: #FFFFFF;
+
+  --panel: #151B24;
+
+  --logo-bg: #FFFFFF;      /* white rounded badge behind the logo */
+
+  --danger-ink: #FF9AA5;  --danger-line: #5A1F27;
+  --warn-bg: #33290F;  --warn-line: #7A5E16;
+}
+
+/* Theme change cross-fades */
+:root, :root * { transition: background-color .35s ease, border-color .35s ease, color .35s ease; }
+
+/* Type
+   Display:  Archivo, font-stretch 125%, weight 800–900, letter-spacing -0.02em to -0.04em, line-height 0.86–1
+   Body/UI:  Archivo, normal width, 400–700
+   Labels:   Geist Mono 12–13px, uppercase, letter-spacing 0.08–0.1em
+   Google Fonts: Archivo:wdth,wght@62..125,400..900 and Geist Mono:wght@400;500
+
+   Shape
+   Radius: 999px buttons and pills · 24px cards · 32px large panels · 10–14px inputs and small tiles
+   Buttons: min height 44px; primary = --inv-bg/--inv-fg; accent = --pink with --on-accent text; secondary = 1.5px --ink outline on --surface
+   Inputs: 44px tall, 1px --line2 border, 10px radius, visible <label> above every field
+*/
