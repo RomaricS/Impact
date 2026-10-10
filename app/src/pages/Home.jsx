@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Nav from '../components/Nav';
 import Hero from '../components/Hero';
 import Ticker from '../components/Ticker';
@@ -14,6 +15,11 @@ import { useTeams } from '../hooks/useTeams';
 
 export default function Home({ theme, toggleTheme }) {
   const { teams, loading } = useTeams();
+
+  useEffect(() => {
+    if (loading || !window.location.hash) return;
+    document.getElementById(window.location.hash.slice(1))?.scrollIntoView();
+  }, [loading]);
 
   return (
     <>

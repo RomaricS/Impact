@@ -5,6 +5,7 @@ import { useTheme } from './hooks/useTheme';
 import Home from './pages/Home';
 import AdminPage from './pages/Admin';
 import LoginPage from './pages/Login';
+import TeamPage from './pages/TeamPage';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -31,6 +32,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home theme={theme} toggleTheme={toggleTheme} toast={toast} />} />
+        <Route path="/teams/:id" element={<TeamPage theme={theme} toggleTheme={toggleTheme} />} />
         <Route path="/admin/login" element={<LoginPage theme={theme} toggleTheme={toggleTheme} />} />
         <Route path="/admin/*" element={
           <ProtectedRoute>

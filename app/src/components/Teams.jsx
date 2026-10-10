@@ -1,12 +1,10 @@
 import { useReveal } from '../hooks/useReveal';
-import TeamDrawer from './TeamDrawer';
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import content from '../content.json';
 import { sortTeams } from '../lib/teamOrder';
 
 export default function Teams({ teams, loading }) {
   const ref = useReveal([loading]);
-  const [activeTeam, setActiveTeam] = useState(null);
 
   const sorted = sortTeams(teams);
 
@@ -28,10 +26,10 @@ export default function Teams({ teams, loading }) {
             {sorted.map(team => {
               const isPink = team.color === 'pink';
               return (
-                <button
+                <Link
                   key={team.id}
+                  to={`/teams/${team.id}`}
                   className={`team-card ${isPink ? 'team-card-pink' : 'team-card-blue'}`}
-                  onClick={() => setActiveTeam(team)}
                 >
                   <div className="team-card-top">
                     <span className="team-num">{team.name.split(' ')[0]}</span>
@@ -47,16 +45,13 @@ export default function Teams({ teams, loading }) {
                       <span className="team-arrow" aria-hidden="true">→</span>
                     </span>
                   </div>
-                </button>
+                </Link>
               );
             })}
           </div>
         )}
       </div>
 
-      {activeTeam && (
-        <TeamDrawer team={activeTeam} onClose={() => setActiveTeam(null)} />
-      )}
     </section>
   );
 }

@@ -5,7 +5,9 @@ export default function Footer() {
   const cols = content.footer.columns;
 
   function scrollTo(id) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    else window.location.assign(`/#${id}`);
   }
 
   return (

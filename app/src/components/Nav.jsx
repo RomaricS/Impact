@@ -6,7 +6,9 @@ export default function Nav({ toggleTheme, theme, onTeamsClick, onTryoutsClick }
   const [menuOpen, setMenuOpen] = useState(false);
 
   function scrollTo(id) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    else window.location.assign(`/#${id}`);
     setMenuOpen(false);
   }
 
