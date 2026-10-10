@@ -25,19 +25,31 @@ export default function Teams({ teams, loading }) {
           <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--muted)' }}>Loading teams…</div>
         ) : (
           <div className="teams-grid rv">
-            {sorted.map(team => (
-              <button key={team.id} className="team-card" onClick={() => setActiveTeam(team)}>
-                <span className={`team-pill ${team.color === 'pink' ? 'pill-p' : 'pill-b'}`}>
-                  {team.division}
-                </span>
-                <div className="team-num">{team.name.split(' ')[0]}</div>
-                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.15rem', letterSpacing: '0.06em' }}>
-                  {team.name}
-                </div>
-                <div className="team-desc">{team.sub} · {team.roster?.length || 0} players</div>
-                <span className="team-arrow">↗</span>
-              </button>
-            ))}
+            {sorted.map(team => {
+              const isPink = team.color === 'pink';
+              return (
+                <button
+                  key={team.id}
+                  className={`team-card ${isPink ? 'team-card-pink' : 'team-card-blue'}`}
+                  onClick={() => setActiveTeam(team)}
+                >
+                  <div className="team-card-top">
+                    <span className="team-num">{team.name.split(' ')[0]}</span>
+                    <span className="team-chip">{team.division}</span>
+                  </div>
+                  <div className="team-card-bottom">
+                    <div>
+                      <div className="team-name">{team.name}</div>
+                      <div className="team-sub">{team.sub}</div>
+                    </div>
+                    <span className="team-roster-link">
+                      <span className="team-roster-text">Roster</span>{' '}
+                      <span className="team-arrow" aria-hidden="true">→</span>
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
