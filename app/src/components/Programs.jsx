@@ -12,10 +12,10 @@ export default function Programs() {
           <p className="sec-sub">{content.programs.subtitle}</p>
         </div>
         <div className="programs-grid rv">
-          {content.programs.items.map(p => (
+          {content.programs.items.map((p, i) => (
             <div key={p.title} className={`prog-card ${p.featured ? 'feat' : ''}`}>
-              <span className="prog-icon">{p.icon}</span>
-              <div className="prog-title">{p.title}</div>
+              <span className="prog-num">{String(i + 1).padStart(2, '0')}</span>
+              <h3 className="prog-title">{p.title}</h3>
               <p className="prog-desc">{p.description}</p>
             </div>
           ))}
