@@ -6,9 +6,11 @@ export default function Programs() {
   return (
     <section className="sec" id="programs" style={{ background: 'var(--bg)' }} ref={ref}>
       <div className="container">
-        <div className="rv">
-          <div className="sec-eye">{content.programs.eyebrow}</div>
-          <h2 className="sec-title">{content.programs.title}</h2>
+        <div className="sec-head rv">
+          <div>
+            <div className="sec-eye">{content.programs.eyebrow}</div>
+            <h2 className="sec-title">{content.programs.title}</h2>
+          </div>
           <p className="sec-sub">{content.programs.subtitle}</p>
         </div>
         <div className="programs-grid rv">

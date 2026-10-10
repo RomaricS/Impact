@@ -43,9 +43,11 @@ export default function Announcements() {
   return (
     <section className="sec announcements-sec" id="news" ref={ref}>
       <div className="container">
-        <div className="rv">
-          <div className="sec-eye">{content.announcements.eyebrow}</div>
-          <h2 className="sec-title">{content.announcements.titlePlain} <span style={{ color: 'var(--pink)' }}>{content.announcements.titleHighlight}</span></h2>
+        <div className="sec-head rv">
+          <div>
+            <div className="sec-eye">{content.announcements.eyebrow}</div>
+            <h2 className="sec-title">{content.announcements.titlePlain} {content.announcements.titleHighlight}</h2>
+          </div>
           <p className="sec-sub">{content.announcements.subtitle}</p>
         </div>
 

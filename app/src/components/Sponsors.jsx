@@ -2,8 +2,6 @@ import { useReveal } from '../hooks/useReveal';
 import { useSponsors } from '../hooks/useSponsors';
 import content from '../content.json';
 
-const TIER_CLASSES = ['t-kill', 't-ace', 't-block'];
-
 export default function Sponsors() {
   const ref = useReveal();
   const { tiers } = useSponsors();
@@ -11,25 +9,28 @@ export default function Sponsors() {
   return (
     <section className="sec sponsors-sec" id="sponsors" ref={ref}>
       <div className="container">
-        <div className="rv">
-          <div className="sec-eye">{content.sponsors.eyebrow}</div>
-          <h2 className="sec-title">{content.sponsors.titlePlain}<br /><span style={{ color: 'var(--pink)' }}>{content.sponsors.titleHighlight}</span></h2>
+        <div className="sec-head rv">
+          <div>
+            <div className="sec-eye">{content.sponsors.eyebrow}</div>
+            <h2 className="sec-title">{content.sponsors.titlePlain} {content.sponsors.titleHighlight}</h2>
+          </div>
           <p className="sec-sub">{content.sponsors.subtitle}</p>
         </div>
 
-        <div className="tier-row">
-          {tiers.map((tier, i) => (
-            <div key={tier.tierLabel} className="rv">
-              <div className="tier-hdr">
-                <span className={`tier-pill ${TIER_CLASSES[i] || 't-block'}`}>{tier.tierLabel}</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{tier.tierAmount}</span>
-                <div className="tier-line" />
+        <div className="tier-list">
+          {tiers.map(tier => (
+            <div key={tier.tierLabel} className="tier-row rv">
+              <div className="tier-meta">
+                <div className="tier-name">{tier.tierLabel}</div>
+                <div className="tier-amount">{tier.tierAmount}</div>
               </div>
-              <div className="logo-row">
+              <div className="logo-grid">
                 {tier.sponsors.map(s => (
                   <div key={s.id} className="logo-card">
-                    <img src={s.logo} alt={s.name || 'Sponsor logo'} />
-                    {s.name && <div className="sponsor-name">{s.name}</div>}
+                    <div className="logo-box">
+                      <img src={s.logo} alt={s.name || 'Sponsor logo'} />
+                    </div>
+                    {s.name && <span className="sponsor-name">{s.name}</span>}
                   </div>
                 ))}
               </div>
@@ -38,11 +39,8 @@ export default function Sponsors() {
         </div>
 
         <div className="become-sponsor rv">
-          <div>
-            <h3>{content.sponsors.becomeTitle}</h3>
-            <p>{content.sponsors.becomeDescription}</p>
-          </div>
-          <a href={`mailto:${content.sponsors.contactEmail}`} className="btn btn-p">{content.sponsors.becomeCta}</a>
+          <p><strong>{content.sponsors.becomeTitle}.</strong> {content.sponsors.becomeDescription}</p>
+          <a href={`mailto:${content.sponsors.contactEmail}`} className="btn-outline">{content.sponsors.becomeCta}</a>
         </div>
       </div>
     </section>

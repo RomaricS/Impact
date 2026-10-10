@@ -13,10 +13,10 @@ export default function Teams({ teams, loading }) {
   return (
     <section className="sec" id="teams" style={{ background: 'var(--bg)' }} ref={ref}>
       <div className="container">
-        <div className="teams-hdr rv">
+        <div className="sec-head rv">
           <div>
             <div className="sec-eye">{content.teams.eyebrow}</div>
-            <h2 className="sec-title">{content.teams.titlePlain}<br />{content.teams.titleHighlight}</h2>
+            <h2 className="sec-title">{content.teams.titlePlain} {content.teams.titleHighlight}</h2>
           </div>
           <p className="sec-sub">{content.teams.subtitle}</p>
         </div>
