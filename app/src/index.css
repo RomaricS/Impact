@@ -1450,21 +1450,56 @@ footer {
 .sponsor-name { font-size: 0.68rem; font-weight: 600; color: var(--muted); text-align: center; margin-top: 0.4rem; letter-spacing: 0.04em; }
 
 /* ANNOUNCEMENTS */
-.ann-feed { display: flex; flex-direction: column; position: relative; max-width: 680px; }
-.ann-feed::before { content: ''; position: absolute; left: 15px; top: 8px; bottom: 8px; width: 1px; background: var(--border); }
-.ann-item { display: grid; grid-template-columns: 32px 1fr; gap: 1.25rem; align-items: start; padding-bottom: 1.5rem; }
-.ann-dot { width: 32px; height: 32px; border-radius: 50%; background: var(--card); border: 2px solid var(--pink); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; margin-top: 2px; position: relative; z-index: 1; }
-.ann-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 0.2s; }
-.ann-card:hover { border-color: rgba(255,31,109,0.2); }
-.ann-photo { width: 100%; height: 180px; object-fit: cover; }
-.ann-body { padding: 1.1rem 1.25rem; }
-.ann-title { font-weight: 700; font-size: 0.97rem; line-height: 1.35; margin-bottom: 0.4rem; }
-.ann-text { font-size: 0.83rem; color: var(--muted); line-height: 1.65; margin-bottom: 0.65rem; }
-.ann-meta { display: flex; align-items: center; gap: 0.6rem; }
-.ann-date { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pink); }
-.ann-tag { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,31,109,0.1); color: var(--pink); padding: 0.15rem 0.5rem; border-radius: 100px; }
-.ann-link { display: inline-block; font-size: 0.78rem; font-weight: 600; color: var(--pink); text-decoration: none; margin-top: 0.65rem; }
-.ann-link:hover { text-decoration: underline; }
+.ann-feed { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 2rem; }
+.ann-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ann-card-lg { flex: 3 1 480px; min-width: 0; overflow: hidden; gap: 0; }
+.ann-card-lg .ann-photo { width: 100%; height: 340px; object-fit: cover; display: block; }
+.ann-card-lg .ann-body { padding: 28px 32px 32px; display: flex; flex-direction: column; gap: 12px; }
+.ann-stack { flex: 2 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+.ann-card-sm { flex: 1; padding: 28px; }
+.ann-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.ann-date { color: var(--muted); }
+.ann-tag { padding: 4px 10px; border-radius: 999px; }
+.ann-tag-signing { background: var(--pink-tint); color: var(--pink-tint-ink); }
+.ann-tag-tournament { background: var(--blue-tint); color: var(--blue-tint-ink); }
+.ann-tag-announcement { background: var(--chip); color: var(--ink); }
+.ann-tag-award { background: #FFF0C9; color: #6B4300; }
+.ann-title { margin: 0; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+.ann-card-lg .ann-title { font-size: 30px; line-height: 1.15; }
+.ann-card-sm .ann-title { font-size: 22px; line-height: 1.2; }
+.ann-text { margin: 0; color: var(--body); line-height: 1.6; }
+.ann-card-sm .ann-text { font-size: 15px; }
+.ann-actions { display: flex; flex-wrap: wrap; gap: 8px 20px; font-weight: 600; font-size: 15px; margin-top: auto; }
+.ann-link { display: inline-flex; align-items: center; gap: 4px; color: var(--ink); text-decoration: none; }
+.ann-link:hover { color: var(--pink); }
+.ann-arrow { display: inline-block; transition: transform 0.2s; }
+.ann-link:hover .ann-arrow { transform: translateX(6px); }
+@media (max-width: 640px) {
+  .ann-card { border-radius: 20px; }
+  .ann-card-lg .ann-photo { height: 180px; }
+  .ann-card-lg .ann-body { padding: 18px 20px 20px; gap: 8px; }
+  .ann-card-sm { padding: 18px 20px; gap: 8px; }
+  .ann-card-lg .ann-title { font-size: 20px; }
+  .ann-card-sm .ann-title { font-size: 18px; }
+  .ann-meta { font-size: 11px; gap: 10px; }
+  .ann-tag { padding: 3px 9px; }
+}
+/* .ann-file-btn is still used by Community.jsx (not yet restyled) — kept until that task migrates it. */
 .ann-file-btn { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; color: var(--pink); text-decoration: none; padding: 0.3rem 0.7rem; border-radius: 100px; border: 1px solid rgba(255,31,109,0.3); background: rgba(255,31,109,0.06); transition: background 0.2s, border-color 0.2s; }
 .ann-file-btn:hover { background: rgba(255,31,109,0.12); border-color: rgba(255,31,109,0.5); }
 
